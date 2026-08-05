@@ -1,0 +1,1104 @@
+<title>신제품 기획 보드</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f3f5fa;
+    --surface: #ffffff;
+    --surface-2: #f6f8fc;
+    --ink: #111827;
+    --ink-2: #6b7280;
+    --muted: #98a2b3;
+    --border: #e1e6ef;
+    --border-strong: #c7d3e6;
+    --navy: #16324f;
+    --accent: #2f6fed;
+    --accent-2: #38bdf8;
+    --accent-soft: #e5eefd;
+    --accent-soft-2: #dbeeff;
+    --good: #0ca30c;
+    --warning: #fab219;
+    --critical: #d03b3b;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4;
+    --header-grad: linear-gradient(120deg, #0f2547, #1e3a5f 70%, #2f6fed);
+    --btn-grad: linear-gradient(120deg, #2f6fed, #38bdf8);
+    --shadow: 0 1px 3px rgba(15,37,71,0.06), 0 6px 18px rgba(15,37,71,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --bg: #0c1220;
+      --surface: #141b28;
+      --surface-2: #182233;
+      --ink: #eef2f8;
+      --ink-2: #a9b4c8;
+      --muted: #78839c;
+      --border: rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.18);
+      --navy: #bcd3f5;
+      --accent: #4c8dff;
+      --accent-2: #38bdf8;
+      --accent-soft: rgba(76,141,255,0.16);
+      --accent-soft-2: rgba(56,189,248,0.14);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0c1220; --surface: #141b28; --surface-2: #182233;
+    --ink: #eef2f8; --ink-2: #a9b4c8; --muted: #78839c;
+    --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.18);
+    --navy: #bcd3f5; --accent: #4c8dff; --accent-2: #38bdf8;
+    --accent-soft: rgba(76,141,255,0.16); --accent-soft-2: rgba(56,189,248,0.14);
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f3f5fa; --surface: #ffffff; --surface-2: #f6f8fc;
+    --ink: #111827; --ink-2: #6b7280; --muted: #98a2b3;
+    --border: #e1e6ef; --border-strong: #c7d3e6;
+    --navy: #16324f; --accent: #2f6fed; --accent-2: #38bdf8;
+    --accent-soft: #e5eefd; --accent-soft-2: #dbeeff;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4;
+    --shadow: 0 1px 3px rgba(15,37,71,0.06), 0 6px 18px rgba(15,37,71,0.06);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Malgun Gothic', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* ---------- Top header ---------- */
+  .topbar {
+    background: var(--header-grad);
+    padding: 14px 28px;
+    box-shadow: 0 4px 14px rgba(15,37,71,0.25);
+  }
+  .topbar-inner {
+    max-width: 1180px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: flex-start; gap: 28px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-badge {
+    background: var(--accent); color: #fff; font-weight: 800; font-size: 11.5px;
+    letter-spacing: 0.04em; padding: 4px 10px; border-radius: 6px; flex: none;
+  }
+  .brand-text { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; color: #fff; }
+
+  .pill-nav { display: flex; gap: 2px; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 4px; }
+  .pill-nav-btn {
+    padding: 8px 16px; border-radius: 9px; border: none; background: transparent;
+    color: rgba(255,255,255,0.75); font-weight: 600; font-size: 13.5px; cursor: pointer;
+    font-family: inherit; white-space: nowrap;
+  }
+  .pill-nav-btn.active { background: #fff; color: #16324f; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+
+  /* ---------- Main ---------- */
+  .main { padding: 28px 28px 60px; max-width: 1180px; margin: 0 auto; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .page-head { margin-bottom: 18px; }
+  .page-title { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; text-wrap: balance; color: var(--navy); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .kw-tag {
+    font-size: 12.5px; font-weight: 700; color: var(--navy); background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    padding: 3px 10px; border-radius: 999px;
+  }
+  .page-desc { color: var(--ink-2); font-size: 13.3px; margin-top: 4px; max-width: 64ch; }
+  .demo-badge {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 11.3px; color: #a3690a;
+    background: color-mix(in srgb, var(--warning) 16%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--warning) 45%, transparent);
+    padding: 4px 9px; border-radius: 999px; font-weight: 600; margin-top: 10px;
+  }
+  @media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) .demo-badge { color: #ffd27a; } }
+  :root[data-theme="dark"] .demo-badge { color: #ffd27a; }
+
+  /* ---------- Subtabs (category / sample filters) ---------- */
+  .subtabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .subtab-btn {
+    padding: 6px 16px; border-radius: 999px; font-size: 12.8px; font-weight: 600;
+    border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink-2); cursor: pointer;
+    font-family: inherit; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .subtab-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .subtab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .subtab-count { font-variant-numeric: tabular-nums; opacity: 0.85; }
+
+  /* ---------- Idea board ---------- */
+  .board-cols { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; }
+  .board-col { flex: 0 0 252px; display: flex; flex-direction: column; gap: 10px; }
+  .board-col-head { display: flex; align-items: center; gap: 7px; padding: 2px 2px 4px; }
+  .board-col-title { font-weight: 700; font-size: 13px; color: var(--navy); }
+  .board-col-count { margin-left: auto; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .idea-card {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--cat-color, var(--accent));
+    border-radius: 12px; padding: 13px 14px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .idea-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+  .idea-title { font-weight: 700; font-size: 13.4px; text-wrap: balance; }
+  .idea-note { font-size: 12.2px; color: var(--ink-2); }
+  .idea-meta { display: flex; align-items: center; gap: 6px; margin-top: 2px; flex-wrap: wrap; }
+  .idea-actions { display: flex; gap: 2px; flex: none; }
+  .icon-btn {
+    width: 22px; height: 22px; border-radius: 6px; border: none; background: transparent;
+    color: var(--muted); cursor: pointer; display: grid; place-items: center; font-size: 12px; flex: none;
+    font-family: inherit;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .icon-btn.danger:hover { color: var(--critical); }
+  .chip {
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;
+  }
+  .chip-good { color: var(--good); background: color-mix(in srgb, var(--good) 14%, var(--surface)); }
+  .chip-warn { color: color-mix(in srgb, var(--warning) 65%, var(--ink) 20%); background: color-mix(in srgb, var(--warning) 22%, var(--surface)); }
+  .chip-low { color: var(--critical); background: color-mix(in srgb, var(--critical) 14%, var(--surface)); }
+  .chip-auto { color: var(--navy); background: var(--accent-soft); }
+  .chip-link {
+    font-size: 11px; color: var(--navy); background: var(--accent-soft);
+    border: none; border-radius: 999px; padding: 3px 8px; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .board-empty {
+    border: 1px dashed var(--border-strong); border-radius: 12px; padding: 44px 24px; text-align: center;
+    color: var(--ink-2); font-size: 13px; background: var(--surface); width: 100%;
+  }
+  .board-col-empty { font-size: 12px; color: var(--muted); border: 1px dashed var(--border-strong); border-radius: 10px; padding: 16px 10px; text-align: center; }
+
+  /* ---------- Market research ---------- */
+  .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .search-input {
+    flex: 1; max-width: 420px; padding: 10px 13px; border-radius: 9px; border: 1px solid var(--border-strong);
+    background: var(--surface); color: var(--ink); font-size: 13.5px; font-family: inherit;
+  }
+  .search-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .btn {
+    padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface);
+    color: var(--ink); font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--btn-grad); border: none; color: #fff;
+    box-shadow: 0 2px 8px rgba(47,111,237,0.35);
+  }
+  .btn-primary:hover { filter: brightness(1.05); }
+  .btn:hover { background: var(--surface-2); }
+  .sample-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+  .sample-label { font-size: 12px; color: var(--muted); }
+
+  .empty-state {
+    border: 1px dashed var(--border-strong); border-radius: 12px; padding: 34px 24px; text-align: center;
+    color: var(--ink-2); font-size: 13px; background: var(--surface);
+  }
+  .empty-state b { color: var(--ink); }
+
+  .result-head { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 12px; }
+  .result-head h3 { font-size: 15.5px; margin: 0; color: var(--navy); }
+  .result-head span { font-size: 12px; color: var(--muted); }
+
+  .product-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; box-shadow: var(--shadow); margin-bottom: 12px;
+  }
+  .product-top { display: flex; gap: 12px; align-items: flex-start; }
+  .rank-badge {
+    flex: none; width: 26px; height: 26px; border-radius: 8px; background: var(--surface-2);
+    color: var(--ink-2); font-weight: 800; font-size: 12px; display: grid; place-items: center;
+    font-variant-numeric: tabular-nums; margin-top: 2px;
+  }
+  .rank-badge.top3 { background: var(--accent-soft); color: var(--navy); }
+  .product-thumb {
+    flex: none; width: 56px; height: 56px; border-radius: 12px; border: 1px solid var(--border);
+    display: grid; place-items: center; color: var(--navy);
+  }
+  .product-name { font-weight: 700; font-size: 14px; text-wrap: balance; }
+  .product-kw { font-size: 11.5px; color: var(--navy); background: var(--accent-soft); display: inline-block; padding: 2px 8px; border-radius: 999px; margin-top: 4px; font-weight: 600; }
+  .product-price-block { margin-left: auto; text-align: right; flex: none; }
+  .price { font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .unit-price { font-size: 11.5px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .channel-link {
+    display: inline-block; margin-top: 6px; font-size: 11.5px; font-weight: 700; color: var(--accent);
+    text-decoration: none;
+  }
+  .channel-link:hover { text-decoration: underline; }
+
+  .product-grid { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 18px; margin-top: 14px; }
+  .block-label { font-size: 10.8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 7px; font-weight: 700; }
+
+  .channel-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .channel-name { width: 40px; flex: none; font-size: 11.5px; color: var(--ink-2); }
+  .channel-bar-track { flex: 1; height: 8px; border-radius: 5px; background: var(--surface-2); overflow: hidden; }
+  .channel-bar-fill { height: 100%; border-radius: 5px; }
+  .channel-val { width: 42px; flex: none; text-align: right; font-size: 11px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+  .kw-pill-list { display: flex; flex-direction: column; gap: 4px; }
+  .kw-pill { display: flex; align-items: center; gap: 6px; font-size: 11.8px; }
+  .kw-pill .ic { flex: none; font-size: 10px; }
+  .kw-pill.pos .ic { color: var(--good); }
+  .kw-pill.neg .ic { color: var(--critical); }
+  .kw-pill .w { color: var(--ink); }
+  .kw-pill .n { color: var(--muted); font-variant-numeric: tabular-nums; margin-left: auto; }
+
+  /* ---------- 1688 sourcing ---------- */
+  .supplier-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 4px; }
+  .badge-power { font-size: 10.5px; font-weight: 700; color: #a3690a; background: color-mix(in srgb, var(--warning) 20%, var(--surface)); border: 1px solid color-mix(in srgb, var(--warning) 40%, transparent); padding: 2px 7px; border-radius: 999px; }
+  .badge-factory { font-size: 10.5px; font-weight: 700; color: var(--navy); background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent); padding: 2px 7px; border-radius: 999px; }
+  .feature-pill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .feature-pill { font-size: 11.5px; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--border); padding: 3px 9px; border-radius: 999px; }
+  .supplier-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 18px; margin-top: 14px; }
+  .sourcing-price-detail { font-size: 11.5px; color: var(--ink); font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .sourcing-price-detail .paren-muted { color: var(--muted); font-weight: 400; }
+  @media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) .badge-power { color: #ffd27a; } }
+  :root[data-theme="dark"] .badge-power { color: #ffd27a; }
+
+  /* thumbnail tint variants (kept subtle, adapt automatically to theme via color-mix) */
+  .thumb-0 { background: color-mix(in srgb, var(--c1) 16%, var(--surface)); }
+  .thumb-1 { background: color-mix(in srgb, var(--c3) 16%, var(--surface)); }
+  .thumb-2 { background: color-mix(in srgb, var(--c4) 16%, var(--surface)); }
+  .thumb-3 { background: color-mix(in srgb, var(--c5) 16%, var(--surface)); }
+  .thumb-4 { background: color-mix(in srgb, var(--c2) 16%, var(--surface)); }
+
+  /* ---------- Strategy ---------- */
+  .insight-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 18px; }
+  .insight-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .insight-card h4 { margin: 0 0 8px; font-size: 13.5px; display: flex; align-items: center; gap: 7px; color: var(--navy); }
+  .insight-card p { margin: 0; font-size: 12.8px; color: var(--ink-2); }
+  .stat-row { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0; font-size: 12.6px; }
+  .stat-row b { font-variant-numeric: tabular-nums; color: var(--ink); }
+  .theme-bar-wrap { margin: 8px 0 2px; }
+  .theme-bar-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+  .theme-bar-track { height: 7px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .theme-bar-fill { height: 100%; border-radius: 4px; background: var(--critical); }
+
+  .stat-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat-tile {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .stat-tile.highlight {
+    background: linear-gradient(135deg, var(--accent-soft), var(--accent-soft-2));
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  }
+  .stat-tile .label { font-size: 11.5px; color: var(--ink-2); }
+  .stat-tile .value { font-size: 19px; font-weight: 800; color: var(--navy); margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+  .strategy-block {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+  .strategy-block h3 { margin: 0 0 12px; font-size: 15.5px; color: var(--navy); }
+  .strategy-block ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 9px; }
+  .strategy-block li { font-size: 13px; color: var(--ink-2); }
+  .strategy-block li b { color: var(--ink); }
+  .checklist { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .checklist label { display: flex; gap: 8px; font-size: 12.8px; color: var(--ink-2); align-items: flex-start; }
+  .checklist input { margin-top: 2px; accent-color: var(--accent); }
+
+  /* ---------- Modal (add / edit idea) ---------- */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(11,18,30,0.45);
+    align-items: center; justify-content: center; padding: 20px; z-index: 100;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--surface); border-radius: 14px; width: 100%; max-width: 420px;
+    box-shadow: 0 12px 40px rgba(15,37,71,0.25); max-height: 90vh; overflow-y: auto;
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .modal-head h3 { margin: 0; font-size: 15px; color: var(--navy); }
+  .modal-close { border: none; background: transparent; color: var(--muted); font-size: 15px; cursor: pointer; width: 26px; height: 26px; border-radius: 7px; }
+  .modal-close:hover { background: var(--surface-2); color: var(--ink); }
+  .modal-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .form-label { font-size: 12px; font-weight: 700; color: var(--ink-2); margin-bottom: -6px; }
+  .form-input {
+    width: 100%; padding: 9px 11px; border-radius: 8px; border: 1px solid var(--border-strong);
+    background: var(--surface); color: var(--ink); font-size: 13.5px; font-family: inherit;
+  }
+  .form-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--border); }
+
+  @media (max-width: 880px) {
+    .product-grid { grid-template-columns: 1fr; }
+    .insight-grid { grid-template-columns: 1fr; }
+    .topbar-inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-badge">IDEA</span>
+      <span class="brand-text">신제품 기획보드</span>
+    </div>
+    <nav class="pill-nav">
+      <button class="pill-nav-btn active" data-view="ideas">아이디어 보드</button>
+      <button class="pill-nav-btn" data-view="research">시장조사</button>
+      <button class="pill-nav-btn" data-view="strategy">전략 인사이트</button>
+      <button class="pill-nav-btn" data-view="sourcing">1688 서치</button>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+  <!-- ================= IDEA BOARD ================= -->
+  <section class="view active" id="view-ideas">
+    <div class="page-head">
+      <div class="page-title">아이디어 보드</div>
+      <div class="page-desc">시장조사에서 검색한 키워드는 전략 인사이트를 바탕으로 아이디어가 자동 생성됩니다. 필요하면 수정·삭제할 수 있어요.</div>
+    </div>
+    <div class="subtabs" id="catSubtabs"></div>
+    <div class="board-cols" id="boardCols"></div>
+  </section>
+
+  <!-- ================= MARKET RESEARCH ================= -->
+  <section class="view" id="view-research">
+    <div class="page-head">
+      <div class="page-title">시장조사</div>
+      <div class="page-desc">검색어를 입력하면 판매순 상위 10개 제품을 채널별 판매량·가격·리뷰 키워드와 함께 보여줍니다.</div>
+      <div class="demo-badge">⚠ 샘플 데이터입니다 — 실서비스에서는 이 화면이 크롤러 API 결과로 대체됩니다</div>
+    </div>
+
+    <div class="search-row">
+      <input class="search-input" id="searchInput" type="text" placeholder="검색어를 입력하세요 (예: 차량용 방향제)" />
+      <button class="btn btn-primary" id="searchBtn">검색</button>
+    </div>
+    <div class="subtabs" id="sampleSubtabs">
+      <span class="sample-label">샘플 검색어:</span>
+    </div>
+
+    <div id="researchResults"></div>
+  </section>
+
+  <!-- ================= STRATEGY ================= -->
+  <section class="view" id="view-strategy">
+    <div class="page-head">
+      <div class="page-title" id="strategyPageTitle">전략 인사이트</div>
+      <div class="page-desc">시장조사 데이터를 기반으로 시장 갭과 진입 전략을 자동으로 계산해 보여줍니다.</div>
+    </div>
+    <div id="strategyResults"></div>
+  </section>
+
+  <!-- ================= 1688 SOURCING ================= -->
+  <section class="view" id="view-sourcing">
+    <div class="page-head">
+      <div class="page-title" id="sourcingPageTitle">1688 서치</div>
+      <div class="page-desc">전략 인사이트에서 조회 중인 검색어를 기준으로, 1688 공급사를 파워셀러·슈퍼 팩토리·낮은 단가 순으로 자동 리스트업합니다.</div>
+      <div class="demo-badge">⚠ 샘플 데이터입니다 — 실서비스에서는 이 화면이 1688 API/크롤러 결과로 대체됩니다</div>
+    </div>
+    <div id="sourcingResults"></div>
+  </section>
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">새 아이디어 추가</h3>
+      <button class="modal-close" id="modalCloseBtn" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="form-label">카테고리</div>
+        <select class="form-input" id="fCategory"></select>
+      </div>
+      <div>
+        <div class="form-label">제목</div>
+        <input class="form-input" id="fTitle" type="text" placeholder="예: 리필형 무향 지속 카 디퓨저" />
+      </div>
+      <div>
+        <div class="form-label">한줄 설명</div>
+        <input class="form-input" id="fNote" type="text" placeholder="아이디어를 한 문장으로 설명해주세요" />
+      </div>
+      <div>
+        <div class="form-label">잠재력</div>
+        <select class="form-input" id="fPotential">
+          <option value="high">높음</option>
+          <option value="mid">보통</option>
+          <option value="low">낮음</option>
+        </select>
+      </div>
+      <div>
+        <div class="form-label">연결할 시장조사 검색어 (선택)</div>
+        <select class="form-input" id="fLink">
+          <option value="">연결 안함</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" id="modalCancelBtn" type="button">취소</button>
+      <button class="btn btn-primary" id="modalSaveBtn" type="button">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var CAT_COLORS = ['var(--c1)','var(--c3)','var(--c4)','var(--c5)','var(--c2)'];
+
+  var CATEGORIES = [
+    { id: 'diffuser', name: '방향제' },
+    { id: 'dehumidifier', name: '제습제' },
+    { id: 'cleaning', name: '청소도구' },
+    { id: 'storage', name: '수납/정리' },
+    { id: 'bath', name: '욕실용품' }
+  ];
+
+  var IDEAS_STORAGE_KEY = 'ideaBoard.ideas.v1';
+  var ideaIdCounter = 1;
+  var IDEAS = [];
+  (function loadIdeas() {
+    try {
+      var raw = localStorage.getItem(IDEAS_STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) IDEAS = parsed;
+      }
+    } catch (e) { /* storage unavailable — start empty */ }
+    var maxId = 0;
+    IDEAS.forEach(function (idea) { if (idea.id > maxId) maxId = idea.id; });
+    ideaIdCounter = maxId + 1;
+  })();
+  function saveIdeas() {
+    try { localStorage.setItem(IDEAS_STORAGE_KEY, JSON.stringify(IDEAS)); } catch (e) { /* storage unavailable */ }
+  }
+
+  var CHANNELS = ['네이버', '쿠팡', '자사몰', '카카오'];
+  var CHANNEL_COLORS = { '네이버': 'var(--c1)', '쿠팡': 'var(--c2)', '자사몰': 'var(--c3)', '카카오': 'var(--c4)' };
+  var TYPE_BY_KEYWORD = { '차량용 방향제': 'diffuser', '제습제': 'dehumidifier' };
+  var KEYWORD_TO_CATEGORY = { '차량용 방향제': 'diffuser', '제습제': 'dehumidifier' };
+
+  function p(name, kw, price, unit, unitPrice, ch, pos, neg, tags) {
+    return { name: name, mainKeyword: kw, price: price, unit: unit, unitPrice: unitPrice, channels: ch, positive: pos, negative: neg, tags: tags };
+  }
+
+  var DATASETS = {
+    '차량용 방향제': [
+      p('센트리 카 디퓨저 클립형', '차량용 클립 디퓨저', 12900, '1개(리필 2입)', '리필 1개당 4,467원',
+        { '네이버': 3200, '쿠팡': 4100, '자사몰': 850, '카카오': 620 },
+        [['향이 은은해요',142], ['차량에 잘 어울림',98], ['디자인 예뻐요',87], ['지속력 좋아요',76], ['설치 간편',65]],
+        [['향이 금방 날아가요',54], ['클립이 헐거워요',41], ['리필이 비쌈',33], ['향 종류 적음',21], ['케이스에 이물질',15]],
+        ['향력부족','내구성']),
+      p('무드포레스트 우드스틱 디퓨저', '차량용 스틱형 디퓨저', 15900, '80ml', '1ml당 199원',
+        { '네이버': 2900, '쿠팡': 3600, '자사몰': 1100, '카카오': 480 },
+        [['나무향 고급스러움',120], ['인테리어 소품같음',88], ['트렁크에도 사용',70], ['오래감',60], ['선물용 좋음',55]],
+        [['병이 잘 깨져요',48], ['향 약함(무향 같음)',44], ['가격이 비쌈',38], ['스틱 흡수 느림',30], ['라벨이 조잡함',12]],
+        ['내구성','향력부족']),
+      p('에어랩 미니 방향제', '차량용 미니 방향제', 8900, '1개', '1개당 8,900원',
+        { '네이버': 2400, '쿠팡': 2600, '자사몰': 700, '카카오': 900 },
+        [['가성비 좋음',133], ['작고 예쁨',90], ['에어컨 근처 부착',70], ['향 다양',58], ['배송 빠름',40]],
+        [['향 약함(무향 같음)',66], ['접착력 약함',50], ['금방 색바램',28], ['통기구에 안 맞음',24], ['내구성 약함',20]],
+        ['향력부족','내구성']),
+      p('리브웰 카시트 디퓨저', '차량용 좌석 디퓨저', 19900, '2개입', '1개당 9,950원',
+        { '네이버': 1900, '쿠팡': 1700, '자사몰': 2200, '카카오': 300 },
+        [['좌석 밑에 숨겨 사용',80], ['향이 세련됨',66], ['디자인 고급',60], ['오래감',48], ['패키지 좋음',30]],
+        [['가격이 비쌈',58], ['2개 다 쓰면 또 사야함',30], ['향 옵션 부족',22], ['설치 위치 애매',18], ['택배 파손',10]],
+        ['가격','용량/리필']),
+      p('젠틀에어 카본 탈취 디퓨저', '차량용 탈취 디퓨저', 13900, '1개(150g)', '1g당 93원',
+        { '네이버': 1600, '쿠팡': 2100, '자사몰': 400, '카카오': 700 },
+        [['탈취력 확실',110], ['담배냄새 잡아줌',76], ['무향이라 자극없음',54], ['오래 씀',40], ['가성비',35]],
+        [['향이 전혀 없어 심심함',44], ['효과 체감 늦음',26], ['디자인 별로',20], ['교체시기 알기 어려움',16], ['입자 날림',9]],
+        ['향력부족']),
+      p('코지홈 카 디퓨저 세트', '차량용 디퓨저 세트', 24900, '3종 세트', '1종당 8,300원',
+        { '네이버': 1800, '쿠팡': 900, '자사몰': 1400, '카카오': 300 },
+        [['여러 향 즐길 수 있음',70], ['선물세트로 좋음',55], ['고급 포장',40], ['용량 넉넉',30], ['브랜드 신뢰',22]],
+        [['가격 부담',50], ['3개 중 1개만 맘에 듦',28], ['부피가 큼',18], ['배송 지연',14], ['낱개 구매 불가',10]],
+        ['가격']),
+      p('소품샵 미니어처 디퓨저 오너먼트', '차량 인테리어 디퓨저', 11900, '1개', '1개당 11,900원',
+        { '네이버': 1100, '쿠팡': 800, '자사몰': 200, '카카오': 2000 },
+        [['인테리어 소품 예쁨',95], ['선물하기 좋음',60], ['작고 귀여움',50], ['향 고급짐',30], ['포장 예쁨',24]],
+        [['향 지속시간 짧음',52], ['실용성 낮음',30], ['가격 대비 용량 적음',26], ['리필 없음',20], ['색 바램 빠름',11]],
+        ['향력부족','용량/리필']),
+      p('클린에어 활성탄 디퓨저', '차량용 활성탄 디퓨저', 9900, '1개(100g)', '1g당 99원',
+        { '네이버': 1500, '쿠팡': 1300, '자사몰': 500, '카카오': 200 },
+        [['탈취+제습 동시',66], ['가성비',50], ['무향이라 부담없음',38], ['곰팡이냄새 제거',30], ['내구성 좋음',20]],
+        [['향이 없어 심심함',40], ['부피가 큼',24], ['교체주기 모호함',18], ['디자인 투박',14], ['습기차면 무거워짐',8]],
+        ['향력부족']),
+      p('퓨어센트 리퀴드 디퓨저', '차량용 리퀴드 디퓨저', 21900, '100ml', '1ml당 219원',
+        { '네이버': 900, '쿠팡': 1200, '자사몰': 700, '카카오': 200 },
+        [['향 퀄리티 좋음',70], ['디자인 고급',45], ['오래감',38], ['브랜드 신뢰',28], ['선물용',20]],
+        [['가격이 비쌈',48], ['리필 구하기 어려움',26], ['용기가 무거움',16], ['향 호불호',14], ['배송 파손 우려',9]],
+        ['가격','용량/리필']),
+      p('데일리스톤 디퓨저 스톤형', '차량용 스톤 디퓨저', 10900, '스톤 3개+오일', '스톤 1개당 3,633원',
+        { '네이버': 800, '쿠팡': 700, '자사몰': 900, '카카오': 100 },
+        [['향이 은은하고 자연스러움',50], ['디자인 미니멀',35], ['오일 리필 가능',28], ['가성비',22], ['선물 포장',15]],
+        [['스톤이 잘 깨짐',30], ['오일이 빨리 마름',24], ['향 종류 적음',18], ['고정이 안됨',14], ['배송시 오일샘',7]],
+        ['내구성'])
+    ],
+    '제습제': [
+      p('물사냥꾼 리필형 제습제', '옷장 제습제', 3900, '500ml', '1ml당 7.8원',
+        { '쿠팡': 5200, '네이버': 3400, '자사몰': 600, '카카오': 400 },
+        [['물이 확실히 차요',180], ['냄새 안남',110], ['리필 편함',90], ['가성비 최고',80], ['디자인 깔끔',50]],
+        [['뚜껑이 잘 안닫힘',60], ['흘림 주의 필요',45], ['용량 대비 빨리 참',30], ['향 없어 밋밋',20], ['플라스틱 냄새',12]],
+        ['누수','향부재']),
+      p('드라이케이스 신발장 제습제', '신발장 제습제', 6900, '3개입', '1개당 2,300원',
+        { '네이버': 3000, '쿠팡': 2600, '자사몰': 500, '카카오': 300 },
+        [['신발 냄새 잡아줌',120], ['작아서 신발장에 딱',85], ['디자인 예쁨',60], ['교체시기 색변화로 알림',50], ['가성비',40]],
+        [['용량 작아 자주 교체',55], ['흡습력 약함',38], ['향 인공적',25], ['뚜껑 부실',18], ['가격대비 개수 적음',10]],
+        ['흡습력약함','교체주기']),
+      p('클린룸 대용량 제습제', '대용량 제습제', 8900, '1L', '1ml당 8.9원',
+        { '쿠팡': 2400, '네이버': 2100, '자사몰': 900, '카카오': 200 },
+        [['대용량이라 오래 씀',90], ['물 차는 게 눈에 보임',70], ['가성비 좋음',60], ['큰 방/창고용으로 좋음',45], ['리필 있음',30]],
+        [['부피가 커서 자리차지',50], ['무거워짐(물 차면)',32], ['흘림 위험',24], ['향 없음',18], ['디자인 투박',9]],
+        ['부피','누수']),
+      p('뽀송홈 미니 제습제 서랍용', '서랍 제습제', 4900, '5개입', '1개당 980원',
+        { '자사몰': 1800, '네이버': 1600, '쿠팡': 1300, '카카오': 200 },
+        [['서랍마다 넣기 좋음',75], ['작고 예쁨',55], ['냄새 없음',40], ['가격 저렴',35], ['휴대 편함',20]],
+        [['흡습력 미미함',48], ['금방 다 참',30], ['디자인만 예쁨(실효성 낮음)',22], ['개별포장 아쉬움',14], ['향 없음',8]],
+        ['흡습력약함']),
+      p('에어드라이 차량용 제습제', '차량용 제습제', 5900, '1개(200ml)', '1ml당 29.5원',
+        { '쿠팡': 1900, '네이버': 1500, '카카오': 700, '자사몰': 300 },
+        [['차량 김서림 방지',80], ['걸이형이라 편리',55], ['향 좋음',40], ['디자인 예쁨',30], ['가성비',22]],
+        [['용량 작아 금방 참',46], ['걸이 고리 약함',28], ['흔들리면 흘러나옴',24], ['향 너무 강함',16], ['가격 대비 아쉬움',9]],
+        ['교체주기','누수']),
+      p('홈드라이 욕실 제습제', '욕실 제습제', 7900, '1개(300g)', '1g당 26.3원',
+        { '네이버': 1400, '쿠팡': 1200, '자사몰': 800, '카카오': 200 },
+        [['곰팡이 냄새 줄어듦',65], ['습기 확실히 잡음',50], ['디자인 심플',35], ['오래 씀',28], ['가성비',20]],
+        [['습기 많은 욕실엔 부족',42], ['흡습 후 무거움',24], ['교체 주기 짧음',18], ['향 없음',12], ['받침대 부실',8]],
+        ['흡습력약함','교체주기']),
+      p('드라이박스 대형 창고용 제습제', '창고 제습제', 12900, '1개(2L)', '1ml당 6.45원',
+        { '자사몰': 1100, '쿠팡': 900, '네이버': 700, '카카오': 100 },
+        [['대용량이라 창고에 최적',55], ['가성비 우수',40], ['오래 지속',30], ['리필 가능',20], ['튼튼한 용기',15]],
+        [['부피가 매우 큼',35], ['무거워서 이동 불편',22], ['흘림 위험 큼',18], ['디자인 투박',10], ['뚜껑 밀폐 약함',7]],
+        ['부피','누수']),
+      p('소프트에어 항균 제습제', '항균 제습제', 9900, '1개(400ml)', '1ml당 24.75원',
+        { '쿠팡': 1000, '네이버': 800, '카카오': 500, '자사몰': 200 },
+        [['항균 성분 안심',50], ['향 은은함',35], ['디자인 고급',28], ['흡습력 좋음',22], ['선물용 좋음',15]],
+        [['가격이 비쌈',38], ['용량 대비 비쌈',24], ['교체 표시 불명확',16], ['흔한 디자인 아님(호불호)',10], ['배송 파손',6]],
+        ['가격']),
+      p('위드리 미니어처 캐릭터 제습제', '캐릭터 제습제', 6500, '1개', '1개당 6,500원',
+        { '카카오': 900, '네이버': 600, '쿠팡': 400, '자사몰': 100 },
+        [['귀여운 디자인',60], ['선물하기 좋음',38], ['작아서 어디든 배치',25], ['인테리어 소품 겸용',18], ['향 좋음',12]],
+        [['실용성보다 장식용',40], ['흡습력 미미함',25], ['가격 대비 용량 적음',18], ['리필 없음',12], ['파손 우려(피규어형)',7]],
+        ['흡습력약함','가격']),
+      p('클리어드롭 프리미엄 리필세트 제습제', '리필세트 제습제', 15900, '본품+리필 4개', '1개당 3,180원',
+        { '자사몰': 700, '네이버': 500, '쿠팡': 400, '카카오': 100 },
+        [['장기적으로 가성비 좋음',45], ['리필만 사면 돼서 편함',32], ['디자인 고급스러움',25], ['용기 재사용 가능',18], ['친환경적',12]],
+        [['초기 구매비용 비쌈',30], ['리필 재고 부족할 때 있음',18], ['본품 크기 큼',12], ['조립 다소 번거로움',9], ['색상 옵션 적음',5]],
+        ['가격'])
+    ]
+  };
+
+  function s(name, price, unit, unitPrice, powerSeller, superFactory, features) {
+    return { name: name, price: price, unit: unit, unitPrice: unitPrice, powerSeller: powerSeller, superFactory: superFactory, features: features };
+  }
+
+  var SOURCING_DATASETS = {
+    '차량용 방향제': [
+      s('이우 홍신 데일리굿즈 유한공사', 2.80, '개당(대량주문)', '1개당 2.80위안', true, true,
+        ['OEM/ODM 가능', '클립형', '무향 리필 지원', '친환경 소재', '로고 인쇄 가능']),
+      s('닝보 이더 트레이딩', 3.10, '개당(대량주문)', '1개당 3.10위안', false, true,
+        ['스틱형', '우드 디자인', '대량 커스텀 가능', '향 3종 선택']),
+      s('광저우 신위 팩토리', 3.50, '개당(대량주문)', '1개당 3.50위안', true, false,
+        ['미니 사이즈', '다양한 컬러', '저가 대량생산']),
+      s('이우 하오리 무역', 3.90, '개당(대량주문)', '1개당 3.90위안', true, true,
+        ['카시트형', '프리미엄 패키지', 'OEM 가능']),
+      s('항저우 뤼예 데일리', 4.20, '개당(대량주문)', '1개당 4.20위안', true, false,
+        ['활성탄 겸용', '탈취+방향 겸용', '친환경 소재']),
+      s('이우 신차오 무역', 4.50, '개당(대량주문)', '1개당 4.50위안', false, true,
+        ['리퀴드형', '고급 유리병', '다양한 향 옵션']),
+      s('취안저우 하이란 트레이딩', 5.20, '개당(대량주문)', '1개당 5.20위안', true, false,
+        ['세트구성', '선물세트', '고급 박스']),
+      s('선전 메이샹 공장', 2.50, '개당(대량주문)', '1개당 2.50위안', false, false,
+        ['저가형', '단순 디자인', 'MOQ 낮음']),
+      s('둥관 자밍 공장', 2.90, '개당(대량주문)', '1개당 2.90위안', false, false,
+        ['저가', '단순 포장', '최소주문 많음']),
+      s('원저우 리싱 공장', 3.30, '개당(대량주문)', '1개당 3.30위안', false, false,
+        ['스톤형', '오일 포함', '기본 디자인'])
+    ],
+    '제습제': [
+      s('이우 칭취 데일리 팩토리', 4.50, '500ml급(대량주문)', '1ml당 0.009위안', true, true,
+        ['리필형', '투명 용기', '대용량 커스텀']),
+      s('이우 톈허 무역', 5.20, '1L급(대량주문)', '1ml당 0.0052위안', true, true,
+        ['대용량 1L', '리필 포함', '튼튼한 용기']),
+      s('광저우 원자 팩토리', 2.90, '개당(대량주문)', '1개당 2.90위안', true, false,
+        ['미니 사이즈', 'OEM 가능', '저가 대량']),
+      s('항저우 신펑 데일리', 3.40, '5개 세트(대량주문)', '1개당 0.68위안', true, false,
+        ['서랍용 미니', '5개 세트 포장', '항균 소재']),
+      s('닝보 산야 트레이딩', 3.80, '개당(대량주문)', '1개당 3.80위안', false, true,
+        ['소형 다회용', '신발장용 사이즈', '다양한 컬러']),
+      s('이우 바오리 무역', 6.10, '개당(대량주문)', '1개당 6.10위안', false, true,
+        ['차량용 걸이형', '방향 겸용', '고급 디자인']),
+      s('취안저우 야신 트레이딩', 7.30, '개당(대량주문)', '1개당 7.30위안', true, false,
+        ['항균 프리미엄', '고급 패키지', '브랜드 커스텀']),
+      s('선전 루이더 공장', 2.20, '개당(대량주문)', '1개당 2.20위안', false, false,
+        ['저가형', '단순 디자인', 'MOQ 낮음']),
+      s('둥관 화메이 공장', 2.60, '개당(대량주문)', '1개당 2.60위안', false, false,
+        ['저가', '단순 포장', '대량 주문 위주']),
+      s('원저우 지에캉 공장', 3.00, '개당(대량주문)', '1개당 3.00위안', false, false,
+        ['캐릭터 디자인', '선물용', '소량 포장'])
+    ]
+  };
+
+  var state = { view: 'ideas', catFilter: 'all', dataset: null, keyword: null };
+
+  /* ---------- product thumbnails (inline icons — no external images) ---------- */
+  function thumbSvg(type) {
+    if (type === 'dehumidifier') {
+      return '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M7.5 10c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5v7a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-7z"/>' +
+        '<line x1="7.5" y1="14.5" x2="16.5" y2="14.5"/>' +
+        '<path d="M12 2.2c.9 1.3 1.6 2.4 1.6 3.3a1.6 1.6 0 1 1-3.2 0c0-.9.7-2 1.6-3.3z" fill="currentColor" stroke="none"/>' +
+        '</svg>';
+    }
+    return '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
+      '<rect x="7.5" y="10.5" width="9" height="10.5" rx="2"/>' +
+      '<rect x="9.7" y="6.3" width="4.6" height="4.6" rx="0.6"/>' +
+      '<rect x="9.2" y="4.2" width="5.6" height="2.6" rx="1"/>' +
+      '<line x1="10.5" y1="6" x2="8" y2="1.2"/>' +
+      '<line x1="12" y1="6" x2="12" y2="0.8"/>' +
+      '<line x1="13.5" y1="6" x2="16" y2="1.2"/>' +
+      '</svg>';
+  }
+
+  /* ---------- render: category subtabs ---------- */
+  var catTabsEl = document.getElementById('catSubtabs');
+  function renderCatTabs() {
+    var catHtml = '<button class="subtab-btn' + (state.catFilter === 'all' ? ' active' : '') + '" data-cat="all">전체<span class="subtab-count">' + IDEAS.length + '</span></button>';
+    CATEGORIES.forEach(function (c) {
+      var n = IDEAS.filter(function (x) { return x.cat === c.id; }).length;
+      catHtml += '<button class="subtab-btn' + (state.catFilter === c.id ? ' active' : '') + '" data-cat="' + c.id + '">' + c.name + '<span class="subtab-count">' + n + '</span></button>';
+    });
+    catTabsEl.innerHTML = catHtml;
+    catTabsEl.querySelectorAll('.subtab-btn').forEach(function (el) {
+      el.addEventListener('click', function () {
+        state.catFilter = el.getAttribute('data-cat');
+        catTabsEl.querySelectorAll('.subtab-btn').forEach(function (x) { x.classList.remove('active'); });
+        el.classList.add('active');
+        renderBoard();
+      });
+    });
+  }
+
+  /* ---------- render: idea board ---------- */
+  var POTENTIAL_LABEL = { high: '잠재력 높음', mid: '잠재력 보통', low: '잠재력 낮음' };
+  var POTENTIAL_CHIP_CLASS = { high: 'chip-good', mid: 'chip-warn', low: 'chip-low' };
+
+  function renderBoard() {
+    var boardEl = document.getElementById('boardCols');
+    if (IDEAS.length === 0) {
+      boardEl.innerHTML = '<div class="board-empty">아직 등록된 아이디어가 없습니다.<br/><b>시장조사</b> 탭에서 검색어를 조회하면 아이디어가 자동으로 생성됩니다.</div>';
+      return;
+    }
+    var cols = CATEGORIES.filter(function (c) { return state.catFilter === 'all' || state.catFilter === c.id; });
+    var html = '';
+    cols.forEach(function (c) {
+      var idx = CATEGORIES.indexOf(c);
+      var color = CAT_COLORS[idx % CAT_COLORS.length];
+      var ideas = IDEAS.filter(function (x) { return x.cat === c.id; });
+      html += '<div class="board-col"><div class="board-col-head"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:' + color + '"></span><span class="board-col-title">' + c.name + '</span><span class="board-col-count">' + ideas.length + '</span></div>';
+      if (ideas.length === 0) {
+        html += '<div class="board-col-empty">아직 아이디어가 없습니다</div>';
+      }
+      ideas.forEach(function (idea) {
+        html += '<div class="idea-card" style="--cat-color:' + color + '" data-idea-id="' + idea.id + '">';
+        html += '<div class="idea-card-head"><div class="idea-title">' + idea.title + '</div>';
+        html += '<div class="idea-actions"><button class="icon-btn" data-edit-idea="' + idea.id + '" title="수정" type="button">✎</button><button class="icon-btn danger" data-delete-idea="' + idea.id + '" title="삭제" type="button">🗑</button></div>';
+        html += '</div>';
+        html += '<div class="idea-note">' + idea.note + '</div><div class="idea-meta">';
+        if (idea.auto) html += '<span class="chip chip-auto">⚡ 자동 생성</span>';
+        html += '<span class="chip ' + POTENTIAL_CHIP_CLASS[idea.potential] + '">● ' + POTENTIAL_LABEL[idea.potential] + '</span>';
+        if (idea.link) html += '<button class="chip-link" data-goto-research="' + idea.link + '">시장조사 보기 →</button>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+    });
+    boardEl.innerHTML = html;
+    document.querySelectorAll('[data-goto-research]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var kw = btn.getAttribute('data-goto-research');
+        switchView('research');
+        document.getElementById('searchInput').value = kw;
+        runSearch(kw);
+      });
+    });
+    document.querySelectorAll('[data-edit-idea]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = Number(btn.getAttribute('data-edit-idea'));
+        var idea = IDEAS.filter(function (x) { return x.id === id; })[0];
+        if (idea) openIdeaModal(idea);
+      });
+    });
+    document.querySelectorAll('[data-delete-idea]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = Number(btn.getAttribute('data-delete-idea'));
+        var idea = IDEAS.filter(function (x) { return x.id === id; })[0];
+        if (!idea) return;
+        if (!window.confirm('‘' + idea.title + '’ 아이디어를 삭제할까요?')) return;
+        IDEAS = IDEAS.filter(function (x) { return x.id !== id; });
+        saveIdeas();
+        renderCatTabs();
+        renderBoard();
+      });
+    });
+  }
+
+  /* ---------- render: sample search subtabs ---------- */
+  var sampleTabsEl = document.getElementById('sampleSubtabs');
+  Object.keys(DATASETS).forEach(function (kw) {
+    var b = document.createElement('button');
+    b.className = 'subtab-btn';
+    b.setAttribute('data-kw', kw);
+    b.textContent = kw;
+    b.addEventListener('click', function () {
+      document.getElementById('searchInput').value = kw;
+      runSearch(kw);
+    });
+    sampleTabsEl.appendChild(b);
+  });
+
+  /* ---------- view switching ---------- */
+  function switchView(view) {
+    state.view = view;
+    document.querySelectorAll('.pill-nav-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-view') === view); });
+    document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+    document.getElementById('view-' + view).classList.add('active');
+  }
+  document.querySelectorAll('.pill-nav-btn').forEach(function (b) {
+    b.addEventListener('click', function () { switchView(b.getAttribute('data-view')); });
+  });
+
+  /* ---------- market research ---------- */
+  function fmtWon(n) { return n.toLocaleString('ko-KR') + '원'; }
+  function fmtNum(n) { return n.toLocaleString('ko-KR'); }
+
+  /* best-selling channel link — real search endpoints, since these sample products don't
+     actually exist on any site (no fabricated product-detail URLs) */
+  function bestChannelLink(d) {
+    var top = CHANNELS.slice().sort(function (a, b) { return d.channels[b] - d.channels[a]; })[0];
+    var q = encodeURIComponent(d.name);
+    var url;
+    if (top === '네이버') url = 'https://search.shopping.naver.com/search/all?query=' + q;
+    else if (top === '쿠팡') url = 'https://www.coupang.com/np/search?component=&q=' + q;
+    else url = 'https://search.naver.com/search.naver?query=' + q;
+    return { channel: top, url: url };
+  }
+
+  function runSearch(kwRaw) {
+    var kw = (kwRaw || '').trim();
+    var el = document.getElementById('researchResults');
+    sampleTabsEl.querySelectorAll('.subtab-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-kw') === kw); });
+    if (!kw) { el.innerHTML = ''; return; }
+    var data = DATASETS[kw];
+    if (!data) {
+      el.innerHTML = '<div class="empty-state">‘<b>' + kw + '</b>’에 대한 샘플 데이터가 없습니다.<br/>지금은 데모용으로 <b>차량용 방향제</b>, <b>제습제</b> 두 검색어만 준비되어 있어요.<br/>실제 서비스에서는 크롤러가 어떤 검색어든 실시간으로 조회합니다.</div>';
+      state.dataset = null; state.keyword = null;
+      renderStrategy();
+      renderSourcing();
+      return;
+    }
+    state.dataset = data; state.keyword = kw;
+    var thumbType = TYPE_BY_KEYWORD[kw] || 'diffuser';
+    var maxCh = Math.max.apply(null, data.flatMap(function (d) { return CHANNELS.map(function (c) { return d.channels[c]; }); }));
+
+    var html = '<div class="result-head"><h3>‘' + kw + '’ 판매순 TOP 10</h3><span>채널 합산 판매량 기준 · 샘플 데이터</span></div>';
+    data.forEach(function (d, i) {
+      var total = CHANNELS.reduce(function (s, c) { return s + d.channels[c]; }, 0);
+      html += '<div class="product-card"><div class="product-top">';
+      html += '<div class="rank-badge' + (i < 3 ? ' top3' : '') + '">' + (i + 1) + '</div>';
+      html += '<div class="product-thumb thumb-' + (i % 5) + '">' + thumbSvg(thumbType) + '</div>';
+      html += '<div><div class="product-name">' + d.name + '</div><div class="product-kw">#' + d.mainKeyword + '</div></div>';
+      var bestLink = bestChannelLink(d);
+      html += '<div class="product-price-block"><div class="price">' + fmtWon(d.price) + '</div><div class="unit-price">' + d.unit + ' · ' + d.unitPrice + '</div>';
+      html += '<a class="channel-link" href="' + bestLink.url + '" target="_blank" rel="noopener noreferrer">' + bestLink.channel + '에서 보기 ↗</a>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div class="product-grid">';
+      html += '<div><div class="block-label">채널별 판매량 (월, 개) · 합산 ' + fmtNum(total) + '</div>';
+      CHANNELS.forEach(function (c) {
+        var v = d.channels[c];
+        var pct = Math.max(4, Math.round((v / maxCh) * 100));
+        html += '<div class="channel-row"><span class="channel-name">' + c + '</span><div class="channel-bar-track"><div class="channel-bar-fill" style="width:' + pct + '%;background:' + CHANNEL_COLORS[c] + '"></div></div><span class="channel-val">' + fmtNum(v) + '</span></div>';
+      });
+      html += '</div>';
+
+      html += '<div><div class="block-label">긍정 리뷰 키워드 TOP 5</div><div class="kw-pill-list">';
+      d.positive.forEach(function (kwp) { html += '<div class="kw-pill pos"><span class="ic">▲</span><span class="w">' + kwp[0] + '</span><span class="n">' + kwp[1] + '</span></div>'; });
+      html += '</div></div>';
+
+      html += '<div><div class="block-label">부정 리뷰 키워드 TOP 5</div><div class="kw-pill-list">';
+      d.negative.forEach(function (kwn) { html += '<div class="kw-pill neg"><span class="ic">▼</span><span class="w">' + kwn[0] + '</span><span class="n">' + kwn[1] + '</span></div>'; });
+      html += '</div></div>';
+
+      html += '</div></div>';
+    });
+    el.innerHTML = html;
+    renderStrategy();
+    renderSourcing();
+    autoGenerateIdea(kw, data);
+  }
+
+  document.getElementById('searchBtn').addEventListener('click', function () { runSearch(document.getElementById('searchInput').value); });
+  document.getElementById('searchInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') runSearch(e.target.value); });
+
+  /* ---------- shared insight computation (used by strategy tab + auto idea generation) ---------- */
+  function computeInsights(data) {
+    var prices = data.map(function (d) { return d.price; });
+    var avgPrice = Math.round(prices.reduce(function (a, b) { return a + b; }, 0) / prices.length);
+    var minPrice = Math.min.apply(null, prices), maxPrice = Math.max.apply(null, prices);
+
+    var chTotals = {};
+    CHANNELS.forEach(function (c) { chTotals[c] = data.reduce(function (s, d) { return s + d.channels[c]; }, 0); });
+    var grandTotal = CHANNELS.reduce(function (s, c) { return s + chTotals[c]; }, 0);
+    var topChannel = CHANNELS.slice().sort(function (a, b) { return chTotals[b] - chTotals[a]; })[0];
+    var weakChannel = CHANNELS.slice().sort(function (a, b) { return chTotals[a] - chTotals[b]; })[0];
+
+    var tagCounts = {};
+    data.forEach(function (d) { d.tags.forEach(function (t) { tagCounts[t] = (tagCounts[t] || 0) + 1; }); });
+    var tagList = Object.keys(tagCounts).map(function (t) { return { tag: t, count: tagCounts[t] }; }).sort(function (a, b) { return b.count - a.count; });
+    var topTag = tagList[0];
+
+    var sortedByPrice = data.slice().sort(function (a, b) { return a.price - b.price; });
+    var biggestGap = 0, gapLow = 0, gapHigh = 0;
+    for (var i = 0; i < sortedByPrice.length - 1; i++) {
+      var gap = sortedByPrice[i + 1].price - sortedByPrice[i].price;
+      if (gap > biggestGap) { biggestGap = gap; gapLow = sortedByPrice[i].price; gapHigh = sortedByPrice[i + 1].price; }
+    }
+
+    return {
+      avgPrice: avgPrice, minPrice: minPrice, maxPrice: maxPrice,
+      chTotals: chTotals, grandTotal: grandTotal, topChannel: topChannel, weakChannel: weakChannel,
+      tagList: tagList, topTag: topTag, gapLow: gapLow, gapHigh: gapHigh
+    };
+  }
+
+  /* ---------- strategy ---------- */
+  function renderStrategy() {
+    var el = document.getElementById('strategyResults');
+    var titleEl = document.getElementById('strategyPageTitle');
+    var data = state.dataset;
+    if (!data) {
+      titleEl.innerHTML = '전략 인사이트';
+      el.innerHTML = '<div class="empty-state">아직 시장조사 데이터가 없습니다.<br/>먼저 <b>시장조사</b> 탭에서 검색어를 조회한 뒤 다시 확인해보세요.</div>';
+      return;
+    }
+    titleEl.innerHTML = '<span class="kw-tag">' + state.keyword + '</span> 전략 인사이트';
+    var ins = computeInsights(data);
+    var avgPrice = ins.avgPrice, minPrice = ins.minPrice, maxPrice = ins.maxPrice;
+    var chTotals = ins.chTotals, grandTotal = ins.grandTotal, topChannel = ins.topChannel, weakChannel = ins.weakChannel;
+    var tagList = ins.tagList, topTag = ins.topTag, gapLow = ins.gapLow, gapHigh = ins.gapHigh;
+
+    var html = '<div class="stat-tiles">';
+    html += '<div class="stat-tile"><div class="label">제품 수</div><div class="value">' + data.length + '개</div></div>';
+    html += '<div class="stat-tile"><div class="label">평균 판매가</div><div class="value">' + fmtWon(avgPrice) + '</div></div>';
+    html += '<div class="stat-tile"><div class="label">가격 범위</div><div class="value" style="font-size:14px">' + fmtWon(minPrice) + '~' + fmtWon(maxPrice) + '</div></div>';
+    html += '<div class="stat-tile highlight"><div class="label">최다 불만 테마</div><div class="value" style="font-size:15px">' + topTag.tag + ' ' + topTag.count + '/' + data.length + '</div></div>';
+    html += '</div>';
+
+    html += '<div class="insight-grid">';
+
+    html += '<div class="insight-card"><h4>💰 가격 포지셔닝</h4>';
+    html += '<p>가격대가 가장 크게 비어 있는 구간: <b>' + fmtWon(gapLow) + ' ~ ' + fmtWon(gapHigh) + '</b> — 이 구간에 진입하면 경쟁이 상대적으로 적습니다.</p>';
+    html += '</div>';
+
+    html += '<div class="insight-card"><h4>🛒 채널 전략</h4>';
+    CHANNELS.forEach(function (c) {
+      var pct = Math.round((chTotals[c] / grandTotal) * 100);
+      html += '<div class="stat-row"><span>' + c + '</span><b>' + pct + '%</b></div>';
+    });
+    html += '<p style="margin-top:6px"><b>' + topChannel + '</b>가 판매를 주도하는 채널이며, <b>' + weakChannel + '</b>는 상대적으로 공략이 덜 된 채널입니다.</p>';
+    html += '</div>';
+
+    html += '<div class="insight-card"><h4>⚠ 반복되는 불만 테마</h4>';
+    tagList.slice(0, 4).forEach(function (t) {
+      var pct = Math.round((t.count / data.length) * 100);
+      html += '<div class="theme-bar-wrap"><div class="theme-bar-label"><span>' + t.tag + '</span><span>' + t.count + '/' + data.length + '개 제품</span></div><div class="theme-bar-track"><div class="theme-bar-fill" style="width:' + pct + '%"></div></div></div>';
+    });
+    html += '</div>';
+
+    html += '<div class="insight-card"><h4>🎯 핵심 차별화 포인트</h4>';
+    html += '<p><b>‘' + topTag.tag + '’</b> 관련 불만이 상위 10개 제품 중 <b>' + topTag.count + '개</b>에서 발견되었습니다. 이 문제를 해결한 제품으로 포지셔닝하면 리뷰 기반 차별화 메시지를 바로 만들 수 있습니다.</p>';
+    html += '</div>';
+
+    html += '</div>'; // insight-grid
+
+    html += '<div class="strategy-block"><h3>시장 침투 전략 — ‘' + state.keyword + '’</h3><ul>';
+    html += '<li><b>제품 설계:</b> 상위 10개 중 ' + topTag.count + '개 제품에서 반복된 <b>‘' + topTag.tag + '’</b> 불만을 해결하는 것을 핵심 스펙으로 잡습니다.</li>';
+    html += '<li><b>가격 전략:</b> 평균가 ' + fmtWon(avgPrice) + ' 대비, 비어있는 <b>' + fmtWon(gapLow) + '~' + fmtWon(gapHigh) + '</b> 구간을 타겟팅해 초기 경쟁을 회피합니다.</li>';
+    html += '<li><b>채널 전략:</b> <b>' + topChannel + '</b>에서 검증된 후 <b>' + weakChannel + '</b> 채널에 상대적으로 낮은 CAC로 조기 진입합니다.</li>';
+    html += '<li><b>메시지 전략:</b> 긍정 키워드 상위권(가성비, 디자인, 지속력 등)은 최소 커트라인으로 유지하고, 부정 키워드를 해결한 지점을 광고 카피 1순위로 사용합니다.</li>';
+    html += '</ul>';
+    html += '<div class="checklist">';
+    html += '<label><input type="checkbox"/> 경쟁사 ' + data.length + '개 제품 리뷰 원문 재확인 (샘플 데이터 → 실데이터 교체 후)</label>';
+    html += '<label><input type="checkbox"/> 타겟 가격대(' + fmtWon(gapLow) + '~' + fmtWon(gapHigh) + ') 원가 구조 검토</label>';
+    html += '<label><input type="checkbox"/> ' + weakChannel + ' 채널 입점 조건 확인</label>';
+    html += '</div></div>';
+
+    el.innerHTML = html;
+  }
+
+  /* ---------- 1688 sourcing (derived from the current strategy-insight keyword) ---------- */
+  function fmtYuan(n) { return '¥' + n.toLocaleString('ko-KR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  var YUAN_TO_KRW = 300;
+  var RETAIL_MULTIPLIER = 6;
+  function sourcingPriceInfo(cny) {
+    var krw300 = Math.round(cny * YUAN_TO_KRW);
+    var krw6x = krw300 * RETAIL_MULTIPLIER;
+    return {
+      yuan: fmtYuan(cny),
+      krw300: krw300.toLocaleString('ko-KR') + '원',
+      krw6x: krw6x.toLocaleString('ko-KR') + '원'
+    };
+  }
+
+  function sourcing1688Link(name) {
+    return 'https://s.1688.com/selloffer/offer_search.htm?keywords=' + encodeURIComponent(name);
+  }
+
+  function renderSourcing() {
+    var el = document.getElementById('sourcingResults');
+    var titleEl = document.getElementById('sourcingPageTitle');
+    var kw = state.keyword;
+    var suppliers = kw ? SOURCING_DATASETS[kw] : null;
+    if (!suppliers) {
+      titleEl.innerHTML = '1688 서치';
+      el.innerHTML = '<div class="empty-state">아직 전략 인사이트에 표시된 검색어가 없습니다.<br/>먼저 <b>시장조사</b> 탭에서 검색어를 조회하면 그 키워드로 1688 공급사를 자동으로 리스트업합니다.</div>';
+      return;
+    }
+    titleEl.innerHTML = '<span class="kw-tag">' + kw + '</span> 1688 서치';
+
+    var sorted = suppliers.slice().sort(function (a, b) {
+      var tierA = (a.powerSeller ? 1 : 0) + (a.superFactory ? 1 : 0);
+      var tierB = (b.powerSeller ? 1 : 0) + (b.superFactory ? 1 : 0);
+      if (tierB !== tierA) return tierB - tierA;
+      return a.price - b.price;
+    });
+
+    var thumbType = TYPE_BY_KEYWORD[kw] || 'diffuser';
+    var html = '<div class="result-head"><h3>‘' + kw + '’ 1688 공급사 리스트</h3><span>파워셀러·슈퍼 팩토리 우선, 동일 등급 내 단가 낮은 순 · 샘플 데이터</span></div>';
+    sorted.forEach(function (sup, i) {
+      var priceInfo = sourcingPriceInfo(sup.price);
+      html += '<div class="product-card"><div class="product-top">';
+      html += '<div class="rank-badge' + (i < 3 ? ' top3' : '') + '">' + (i + 1) + '</div>';
+      html += '<div class="product-thumb thumb-' + (i % 5) + '">' + thumbSvg(thumbType) + '</div>';
+      html += '<div>';
+      html += '<div class="supplier-badges">';
+      if (sup.powerSeller) html += '<span class="badge-power">⚡ 파워셀러</span>';
+      if (sup.superFactory) html += '<span class="badge-factory">🏭 슈퍼 팩토리</span>';
+      html += '</div>';
+      html += '<div class="product-name">' + sup.name + '</div>';
+      html += '</div>';
+      html += '<div class="product-price-block"><div class="price">' + priceInfo.yuan + '</div><div class="sourcing-price-detail">' + priceInfo.krw300 + '<span class="paren-muted">(×300)</span> · ' + priceInfo.krw6x + '<span class="paren-muted">(×6배)</span></div>';
+      html += '<a class="channel-link" href="' + sourcing1688Link(sup.name) + '" target="_blank" rel="noopener noreferrer">1688에서 보기 ↗</a>';
+      html += '</div>';
+      html += '</div>';
+
+      html += '<div class="supplier-grid">';
+      html += '<div><div class="block-label">단가 비교</div>';
+      html += '<div class="stat-row"><span>용량별 단가</span><b>' + sup.unitPrice + '</b></div>';
+      html += '</div>';
+      html += '<div><div class="block-label">제품 특징 키워드</div><div class="feature-pill-list">';
+      sup.features.forEach(function (f) { html += '<span class="feature-pill">' + f + '</span>'; });
+      html += '</div></div>';
+      html += '</div>';
+
+      html += '</div>';
+    });
+    el.innerHTML = html;
+  }
+
+  /* ---------- auto-generate an idea card from a market research search ---------- */
+  function autoGenerateIdea(kw, data) {
+    var ins = computeInsights(data);
+    var catId = KEYWORD_TO_CATEGORY[kw] || CATEGORIES[0].id;
+    var payload = {
+      cat: catId,
+      title: kw + ' — ‘' + ins.topTag.tag + '’ 개선 아이디어',
+      note: '평균가 ' + fmtWon(ins.avgPrice) + ' · 상위 10개 중 ' + ins.topTag.count + '개 제품이 ‘' + ins.topTag.tag + '’ 문제를 언급 → 이 문제를 해결하면 차별화 가능',
+      potential: 'high',
+      link: kw,
+      auto: true,
+      sourceKeyword: kw
+    };
+    var existingIdx = IDEAS.findIndex(function (x) { return x.sourceKeyword === kw; });
+    if (existingIdx >= 0) {
+      payload.id = IDEAS[existingIdx].id;
+      IDEAS[existingIdx] = payload;
+    } else {
+      payload.id = ideaIdCounter++;
+      IDEAS.push(payload);
+    }
+    saveIdeas();
+    renderCatTabs();
+    if (state.view === 'ideas') renderBoard();
+  }
+
+  /* ---------- idea modal (add / edit) ---------- */
+  var modalOverlay = document.getElementById('modalOverlay');
+  var modalTitle = document.getElementById('modalTitle');
+  var fCategory = document.getElementById('fCategory');
+  var fTitle = document.getElementById('fTitle');
+  var fNote = document.getElementById('fNote');
+  var fPotential = document.getElementById('fPotential');
+  var fLink = document.getElementById('fLink');
+  var editingIdeaId = null;
+
+  CATEGORIES.forEach(function (c) {
+    var opt = document.createElement('option');
+    opt.value = c.id; opt.textContent = c.name;
+    fCategory.appendChild(opt);
+  });
+  Object.keys(DATASETS).forEach(function (kw) {
+    var opt = document.createElement('option');
+    opt.value = kw; opt.textContent = kw;
+    fLink.appendChild(opt);
+  });
+
+  function openIdeaModal(idea) {
+    editingIdeaId = idea ? idea.id : null;
+    modalTitle.textContent = idea ? '아이디어 수정' : '새 아이디어 추가';
+    fCategory.value = idea ? idea.cat : (state.catFilter !== 'all' ? state.catFilter : CATEGORIES[0].id);
+    fTitle.value = idea ? idea.title : '';
+    fNote.value = idea ? idea.note : '';
+    fPotential.value = idea ? idea.potential : 'mid';
+    fLink.value = idea && idea.link ? idea.link : '';
+    modalOverlay.classList.add('open');
+    fTitle.focus();
+  }
+  function closeIdeaModal() {
+    modalOverlay.classList.remove('open');
+    editingIdeaId = null;
+  }
+
+  document.getElementById('modalCloseBtn').addEventListener('click', closeIdeaModal);
+  document.getElementById('modalCancelBtn').addEventListener('click', closeIdeaModal);
+  modalOverlay.addEventListener('click', function (e) { if (e.target === modalOverlay) closeIdeaModal(); });
+
+  document.getElementById('modalSaveBtn').addEventListener('click', function () {
+    var title = fTitle.value.trim();
+    if (!title) { fTitle.focus(); fTitle.style.borderColor = 'var(--critical)'; return; }
+    fTitle.style.borderColor = '';
+    var payload = {
+      cat: fCategory.value,
+      title: title,
+      note: fNote.value.trim(),
+      potential: fPotential.value,
+      link: fLink.value || null
+    };
+    if (editingIdeaId !== null) {
+      IDEAS = IDEAS.map(function (x) { return x.id === editingIdeaId ? Object.assign({}, x, payload) : x; });
+    } else {
+      payload.id = ideaIdCounter++;
+      IDEAS.push(payload);
+    }
+    saveIdeas();
+    closeIdeaModal();
+    renderCatTabs();
+    renderBoard();
+  });
+
+  renderCatTabs();
+  renderBoard();
+  renderStrategy();
+  renderSourcing();
+})();
+</script>
