@@ -245,20 +245,10 @@ function splitIntoReviewChunks(bodyText) {
 
 
 // ---------- shared browser (Playwright) ----------
-// A single shared instance, with uses queued one at a time — headless Chromium is heavy, and
-// running several concurrently would risk exhausting memory on a small host.
-let browserPromise = null;
-function getBrowser() {
-  if (!browserPromise) {
-    browserPromise = chromium.launch({
-      headless: true,
-      // Low-memory-container flags — matters on hosts like Render's free tier (512MB total),
-      // where a default Chromium launch can push the whole process over the limit by itself.
-      args: ['--disable-dev-shm-usage', '--disable-gpu', '--no-zygote', '--disable-software-rasterizer', '--disable-extensions']
-    });
-  }
-  return browserPromise;
-}
+// One browser process at a time, launched fresh per operation and always closed afterward
+// (not kept as a long-lived singleton) — a resident Chromium process is exactly what tips total
+// memory over the limit on a constrained host, and closing it fully between uses keeps steady-state
+// usage down even though it costs a few hundred ms of extra launch time per call.
 let playwrightQueue = Promise.resolve();
 function runExclusive(fn) {
   const run = playwrightQueue.then(fn, fn);
@@ -266,6 +256,50 @@ function runExclusive(fn) {
   return run;
 }
 const DEFAULT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36';
+// 60s: generous enough for the pagination fallback's worst case (goto 20s + repeated click-and-wait
+// cycles up to 4x6s) while still guaranteeing the browser process can't stay resident indefinitely.
+const PLAYWRIGHT_OP_TIMEOUT_MS = 60000;
+
+function withTimeout(promiseFactory, ms, label) {
+  const op = Promise.resolve().then(promiseFactory);
+  op.catch(() => {}); // we're about to abandon this on timeout — don't let it surface as an unhandled rejection later
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+  });
+  return Promise.race([op, timeout]).finally(() => clearTimeout(timer));
+}
+
+// Launches Chromium, hands `fn` a ready page, and unconditionally closes page → context → browser
+// in reverse order once `fn` settles (success, error, or timeout) — no code path leaves a browser
+// process resident. `--no-sandbox`/`--disable-setuid-sandbox` are required because the official
+// Playwright Docker image runs as root by default, and Chromium refuses to use its sandbox as root.
+async function runInBrowserPage(fn, label) {
+  return runExclusive(async () => {
+    const browser = await chromium.launch({
+      headless: true,
+      args: [
+        '--no-sandbox', '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage', '--disable-gpu', '--no-zygote', '--disable-software-rasterizer', '--disable-extensions'
+      ]
+    });
+    try {
+      const context = await browser.newContext({ userAgent: DEFAULT_UA, locale: 'ko-KR' });
+      try {
+        const page = await context.newPage();
+        try {
+          return await withTimeout(() => fn(page), PLAYWRIGHT_OP_TIMEOUT_MS, label);
+        } finally {
+          await page.close().catch(() => {});
+        }
+      } finally {
+        await context.close().catch(() => {});
+      }
+    } finally {
+      await browser.close().catch(() => {});
+    }
+  });
+}
 
 // ---------- generic static-HTML review detection (fallback path, no adapter matched) ----------
 // Real review lists are timestamped per entry, so a DENSE run of nearby dates is strong,
@@ -358,46 +392,38 @@ async function clickNextAndWaitForChange(page) {
 // Generic DOM fallback: click the review tab, scroll it into view, then page through using
 // content-change detection (not fixed timeouts) — used only when no adapter recognizes the site.
 async function renderAndPaginateReviews(url) {
-  return runExclusive(async () => {
-    const browser = await getBrowser();
-    const context = await browser.newContext({ userAgent: DEFAULT_UA, locale: 'ko-KR' });
-    const page = await context.newPage();
+  return runInBrowserPage(async (page) => {
     try {
-      try {
-        await page.goto(url, { waitUntil: 'networkidle', timeout: 20000 });
-      } catch (e) {
-        // some pages keep a connection open (polling/analytics) and never reach networkidle —
-        // that's fine, we still got the DOM; just proceed without treating it as fatal.
-      }
-      await page.waitForTimeout(3000);
-      for (const label of REVIEW_TAB_LABELS) {
-        try {
-          const locator = page.getByText(label, { exact: false }).first();
-          if (await locator.count() > 0) {
-            await locator.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
-            await locator.click({ timeout: 2000 });
-            await page.waitForTimeout(1200);
-            break;
-          }
-        } catch (e) { /* tab not present/clickable — fine, keep going */ }
-      }
-      for (let i = 0; i < 4; i++) {
-        try { await page.evaluate(() => window.scrollBy(0, document.body.scrollHeight / 4)); } catch (e) { /* ignore */ }
-        await page.waitForTimeout(500);
-      }
-
-      let combinedHtml = await page.content();
-      for (let click = 0; click < MAX_PAGINATION_CLICKS; click++) {
-        const advanced = await clickNextAndWaitForChange(page);
-        if (!advanced) break;
-        combinedHtml += ' ' + (await page.content());
-      }
-      return combinedHtml;
-    } finally {
-      await page.close().catch(() => {});
-      await context.close().catch(() => {});
+      await page.goto(url, { waitUntil: 'networkidle', timeout: 20000 });
+    } catch (e) {
+      // some pages keep a connection open (polling/analytics) and never reach networkidle —
+      // that's fine, we still got the DOM; just proceed without treating it as fatal.
     }
-  });
+    await page.waitForTimeout(3000);
+    for (const label of REVIEW_TAB_LABELS) {
+      try {
+        const locator = page.getByText(label, { exact: false }).first();
+        if (await locator.count() > 0) {
+          await locator.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+          await locator.click({ timeout: 2000 });
+          await page.waitForTimeout(1200);
+          break;
+        }
+      } catch (e) { /* tab not present/clickable — fine, keep going */ }
+    }
+    for (let i = 0; i < 4; i++) {
+      try { await page.evaluate(() => window.scrollBy(0, document.body.scrollHeight / 4)); } catch (e) { /* ignore */ }
+      await page.waitForTimeout(500);
+    }
+
+    let combinedHtml = await page.content();
+    for (let click = 0; click < MAX_PAGINATION_CLICKS; click++) {
+      const advanced = await clickNextAndWaitForChange(page);
+      if (!advanced) break;
+      combinedHtml += ' ' + (await page.content());
+    }
+    return combinedHtml;
+  }, 'renderAndPaginateReviews');
 }
 
 // ================= site adapters =================
@@ -411,10 +437,7 @@ async function renderAndPaginateReviews(url) {
 // sniff ITS OWN network calls during one real render, then call the review API directly afterward —
 // no more browser needed once we know product_no + widget_code.
 async function discoverAlphaReviewWidget(rawUrl) {
-  return runExclusive(async () => {
-    const browser = await getBrowser();
-    const context = await browser.newContext({ userAgent: DEFAULT_UA, locale: 'ko-KR' });
-    const page = await context.newPage();
+  return runInBrowserPage(async (page) => {
     const captured = [];
     page.on('response', async (res) => {
       const u = res.url();
@@ -423,30 +446,25 @@ async function discoverAlphaReviewWidget(rawUrl) {
       if (!ct.includes('json')) return;
       try { captured.push({ url: u, json: await res.json() }); } catch (e) { /* non-JSON or empty body */ }
     });
-    try {
-      try { await page.goto(rawUrl, { waitUntil: 'networkidle', timeout: 20000 }); } catch (e) { /* proceed anyway */ }
-      await page.waitForTimeout(3000);
-      // A wider "full review list" sub-widget can init noticeably later than a narrower "photo
-      // carousel" sub-widget above the fold — clicking the review tab is unreliable (overlay
-      // banners intercept it) and, empirically, isn't actually what triggers it; what matters is
-      // giving the page enough total elapsed time while repeatedly scrolling. Poll the captured
-      // responses themselves and stop early once a `/meta` call reports a total_count we haven't
-      // already seen, instead of guessing a fixed duration.
-      // Different sub-widgets on the same page load on their own independent schedule (a photo
-      // carousel above the fold can fire well before the full review-list widget lower down), so
-      // stopping as soon as ONE candidate appears and stays unchanged for a few rounds is unsafe —
-      // a bigger one can still be about to fire. Always run the full budget; the extra few seconds
-      // buys real correctness (right widget_code) instead of settling for the first one seen.
-      for (let i = 0; i < 14; i++) {
-        try { await page.evaluate(() => window.scrollBy(0, document.body.scrollHeight / 6)); } catch (e) { /* ignore */ }
-        await page.waitForTimeout(900);
-      }
-    } finally {
-      await page.close().catch(() => {});
-      await context.close().catch(() => {});
+    try { await page.goto(rawUrl, { waitUntil: 'networkidle', timeout: 20000 }); } catch (e) { /* proceed anyway */ }
+    await page.waitForTimeout(3000);
+    // A wider "full review list" sub-widget can init noticeably later than a narrower "photo
+    // carousel" sub-widget above the fold — clicking the review tab is unreliable (overlay
+    // banners intercept it) and, empirically, isn't actually what triggers it; what matters is
+    // giving the page enough total elapsed time while repeatedly scrolling. Poll the captured
+    // responses themselves and stop early once a `/meta` call reports a total_count we haven't
+    // already seen, instead of guessing a fixed duration.
+    // Different sub-widgets on the same page load on their own independent schedule (a photo
+    // carousel above the fold can fire well before the full review-list widget lower down), so
+    // stopping as soon as ONE candidate appears and stays unchanged for a few rounds is unsafe —
+    // a bigger one can still be about to fire. Always run the full budget; the extra few seconds
+    // buys real correctness (right widget_code) instead of settling for the first one seen.
+    for (let i = 0; i < 14; i++) {
+      try { await page.evaluate(() => window.scrollBy(0, document.body.scrollHeight / 6)); } catch (e) { /* ignore */ }
+      await page.waitForTimeout(900);
     }
     return captured;
-  });
+  }, 'discoverAlphaReviewWidget');
 }
 
 // The widget set can include several sub-widgets (photo-only carousel, rating summary, notice,
@@ -909,37 +927,30 @@ function normalizeOcrText(text) {
 }
 
 async function collectDetailImageUrls(rawUrl) {
-  return runExclusive(async () => {
-    const browser = await getBrowser();
-    const context = await browser.newContext({ userAgent: DEFAULT_UA, locale: 'ko-KR' });
-    const page = await context.newPage();
-    try {
-      await page.goto(rawUrl, { waitUntil: 'domcontentloaded', timeout: FETCH_TIMEOUT_MS });
-      for (const label of ['상세정보', '상세 정보', 'PRODUCT INFO', 'Detail']) {
-        try {
-          const locator = page.getByText(label, { exact: false }).first();
-          if (await locator.count() > 0) { await locator.click({ timeout: 1500 }); break; }
-        } catch (e) { /* tab not present/clickable — description content may already be visible */ }
-      }
-      // Nudge lazy-loaded (IntersectionObserver-based) images into loading by scrolling through.
-      for (let i = 0; i < 6; i++) {
-        await page.evaluate((step) => window.scrollBy(0, step), 1200);
-        await page.waitForTimeout(250);
-      }
-      await page.waitForTimeout(500);
-
-      const urls = await page.evaluate(({ minW, minH }) => {
-        return Array.from(document.querySelectorAll('img'))
-          .filter((img) => img.naturalWidth >= minW && img.naturalHeight >= minH)
-          .map((img) => img.currentSrc || img.src)
-          .filter(Boolean);
-      }, { minW: OCR_MIN_WIDTH, minH: OCR_MIN_HEIGHT });
-
-      return [...new Set(urls)];
-    } finally {
-      await context.close();
+  return runInBrowserPage(async (page) => {
+    await page.goto(rawUrl, { waitUntil: 'domcontentloaded', timeout: FETCH_TIMEOUT_MS });
+    for (const label of ['상세정보', '상세 정보', 'PRODUCT INFO', 'Detail']) {
+      try {
+        const locator = page.getByText(label, { exact: false }).first();
+        if (await locator.count() > 0) { await locator.click({ timeout: 1500 }); break; }
+      } catch (e) { /* tab not present/clickable — description content may already be visible */ }
     }
-  });
+    // Nudge lazy-loaded (IntersectionObserver-based) images into loading by scrolling through.
+    for (let i = 0; i < 6; i++) {
+      await page.evaluate((step) => window.scrollBy(0, step), 1200);
+      await page.waitForTimeout(250);
+    }
+    await page.waitForTimeout(500);
+
+    const urls = await page.evaluate(({ minW, minH }) => {
+      return Array.from(document.querySelectorAll('img'))
+        .filter((img) => img.naturalWidth >= minW && img.naturalHeight >= minH)
+        .map((img) => img.currentSrc || img.src)
+        .filter(Boolean);
+    }, { minW: OCR_MIN_WIDTH, minH: OCR_MIN_HEIGHT });
+
+    return [...new Set(urls)];
+  }, 'collectDetailImageUrls');
 }
 
 async function ocrImages(urls) {
@@ -1329,4 +1340,16 @@ const server = http.createServer((req, res) => {
 
 server.listen(port, () => {
   console.log(`신제품 기획 보드 서버 실행 중: http://localhost:${port}`);
+});
+
+// Last-resort safety net: a bug in one request's analysis (a rejected promise nothing awaited, an
+// unexpected throw deep in the Playwright/OCR pipeline) should not take the whole process down and
+// drop every other in-flight request. Per-request try/catch (fetchOne, analyzeProductPage) is the
+// real defense; this only logs so a real problem doesn't process out into the wild. Note this
+// cannot help against an OS-level OOM kill — that terminates the process before any JS runs.
+process.on('unhandledRejection', (err) => {
+  console.error('[unhandled-rejection]', err);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[uncaught-exception]', err);
 });
