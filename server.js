@@ -7,6 +7,8 @@ import { chromium } from 'playwright';
 import { createWorker } from 'tesseract.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+try { process.loadEnvFile(path.join(__dirname, '.env')); } catch (e) { /* no .env file — fine in production (Render), where config comes from real env vars */ }
+
 const publicPath = path.join(__dirname, 'public');
 const port = process.env.PORT || 8080;
 
@@ -247,7 +249,14 @@ function splitIntoReviewChunks(bodyText) {
 // running several concurrently would risk exhausting memory on a small host.
 let browserPromise = null;
 function getBrowser() {
-  if (!browserPromise) browserPromise = chromium.launch({ headless: true });
+  if (!browserPromise) {
+    browserPromise = chromium.launch({
+      headless: true,
+      // Low-memory-container flags — matters on hosts like Render's free tier (512MB total),
+      // where a default Chromium launch can push the whole process over the limit by itself.
+      args: ['--disable-dev-shm-usage', '--disable-gpu', '--no-zygote', '--disable-software-rasterizer', '--disable-extensions']
+    });
+  }
   return browserPromise;
 }
 let playwrightQueue = Promise.resolve();
@@ -1133,7 +1142,11 @@ async function analyzeProductPage(rawUrl, html) {
   // fragment (especially noisy OCR output) is evidence, not a selling point, and showing it as one
   // reads as nonsensical to someone doing real product planning — better to honestly report nothing
   // found than to guess.
-  if (sellingPoints.length < 3) {
+  // Gated behind ENABLE_OCR (default off): loading Tesseract's WASM engine + kor+eng language
+  // models sits in memory for the process's whole lifetime, and on a 512MB host that's enough on
+  // its own to push Chromium + Node over the limit and get OOM-killed. Off by default so the
+  // deployed app runs lean; set ENABLE_OCR=true locally (more headroom) to get the OCR fallback.
+  if (sellingPoints.length < 3 && process.env.ENABLE_OCR === 'true') {
     try {
       const imageUrls = await collectDetailImageUrls(rawUrl);
       console.log('[selling-points][ocr]', rawUrl, 'detail images considered=' + imageUrls.length, '(min ' + OCR_MIN_WIDTH + 'x' + OCR_MIN_HEIGHT + 'px)');
