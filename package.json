@@ -1,0 +1,18 @@
+{
+  "name": "product-planning-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "신제품 기획 보드 - 네이버쇼핑 API 연동 백엔드 (1단계 PoC)",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "search": "node --env-file=.env naver-search.js"
+  },
+  "dependencies": {
+    "playwright": "^1.62.1",
+    "tesseract.js": "^5.1.1"
+  }
+}

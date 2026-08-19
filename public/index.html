@@ -1,0 +1,586 @@
+<title>신제품 기획 보드</title>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f3f5fa;
+    --surface: #ffffff;
+    --surface-2: #f6f8fc;
+    --ink: #111827;
+    --ink-2: #6b7280;
+    --muted: #98a2b3;
+    --border: #e1e6ef;
+    --border-strong: #c7d3e6;
+    --navy: #16324f;
+    --accent: #2f6fed;
+    --accent-2: #38bdf8;
+    --accent-soft: #e5eefd;
+    --accent-soft-2: #dbeeff;
+    --good: #0ca30c;
+    --warning: #fab219;
+    --critical: #d03b3b;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4;
+    --header-grad: linear-gradient(120deg, #0f2547, #1e3a5f 70%, #2f6fed);
+    --btn-grad: linear-gradient(120deg, #2f6fed, #38bdf8);
+    --shadow: 0 1px 3px rgba(15,37,71,0.06), 0 6px 18px rgba(15,37,71,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --bg: #0c1220;
+      --surface: #141b28;
+      --surface-2: #182233;
+      --ink: #eef2f8;
+      --ink-2: #a9b4c8;
+      --muted: #78839c;
+      --border: rgba(255,255,255,0.10);
+      --border-strong: rgba(255,255,255,0.18);
+      --navy: #bcd3f5;
+      --accent: #4c8dff;
+      --accent-2: #38bdf8;
+      --accent-soft: rgba(76,141,255,0.16);
+      --accent-soft-2: rgba(56,189,248,0.14);
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0c1220; --surface: #141b28; --surface-2: #182233;
+    --ink: #eef2f8; --ink-2: #a9b4c8; --muted: #78839c;
+    --border: rgba(255,255,255,0.10); --border-strong: rgba(255,255,255,0.18);
+    --navy: #bcd3f5; --accent: #4c8dff; --accent-2: #38bdf8;
+    --accent-soft: rgba(76,141,255,0.16); --accent-soft-2: rgba(56,189,248,0.14);
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.35);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f3f5fa; --surface: #ffffff; --surface-2: #f6f8fc;
+    --ink: #111827; --ink-2: #6b7280; --muted: #98a2b3;
+    --border: #e1e6ef; --border-strong: #c7d3e6;
+    --navy: #16324f; --accent: #2f6fed; --accent-2: #38bdf8;
+    --accent-soft: #e5eefd; --accent-soft-2: #dbeeff;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4;
+    --shadow: 0 1px 3px rgba(15,37,71,0.06), 0 6px 18px rgba(15,37,71,0.06);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, 'Malgun Gothic', 'Apple SD Gothic Neo', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* ---------- Top header ---------- */
+  .topbar {
+    background: var(--header-grad);
+    padding: 14px 28px;
+    box-shadow: 0 4px 14px rgba(15,37,71,0.25);
+  }
+  .topbar-inner {
+    max-width: 1180px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: flex-start; gap: 28px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-badge {
+    background: var(--accent); color: #fff; font-weight: 800; font-size: 11.5px;
+    letter-spacing: 0.04em; padding: 4px 10px; border-radius: 6px; flex: none;
+  }
+  .brand-text { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; color: #fff; }
+
+  .pill-nav { display: flex; gap: 2px; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 4px; }
+  .pill-nav-btn {
+    padding: 8px 16px; border-radius: 9px; border: none; background: transparent;
+    color: rgba(255,255,255,0.75); font-weight: 600; font-size: 13.5px; cursor: pointer;
+    font-family: inherit; white-space: nowrap;
+  }
+  .pill-nav-btn.active { background: #fff; color: #16324f; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+
+  /* ---------- Main ---------- */
+  .main { padding: 28px 28px 60px; max-width: 1180px; margin: 0 auto; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .page-head { margin-bottom: 18px; }
+  .page-title { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; text-wrap: balance; color: var(--navy); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .page-desc { color: var(--ink-2); font-size: 13.3px; margin-top: 4px; max-width: 64ch; }
+
+  /* ---------- Market research: link input boxes ---------- */
+  .link-research-title { font-weight: 700; font-size: 14px; color: var(--navy); margin-bottom: 4px; }
+  .link-research-desc { font-size: 12.6px; color: var(--ink-2); max-width: 64ch; margin-bottom: 14px; }
+  .link-box-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+  .link-box { display: flex; align-items: center; gap: 8px; }
+  .link-box-num {
+    flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--ink-2); font-size: 11px; font-weight: 700; display: grid; place-items: center;
+  }
+  .link-box-input {
+    flex: 1; min-width: 0; padding: 9px 12px; border-radius: 9px; border: 1px solid var(--border-strong);
+    background: var(--surface); color: var(--ink); font-size: 13px; font-family: inherit;
+  }
+  .link-box-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .link-box-clear {
+    flex: none; width: 22px; height: 22px; border-radius: 6px; border: none; background: transparent;
+    color: var(--muted); cursor: pointer; display: grid; place-items: center; font-size: 12px; font-family: inherit;
+  }
+  .link-box-clear:hover { background: var(--surface-2); color: var(--critical); }
+  .link-research-actions { display: flex; align-items: center; gap: 10px; margin: 4px 0 22px; }
+  .link-count { font-size: 12px; color: var(--muted); }
+
+  .btn {
+    padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface);
+    color: var(--ink); font-weight: 700; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  .btn-primary { background: var(--btn-grad); border: none; color: #fff; box-shadow: 0 2px 8px rgba(47,111,237,0.35); }
+  .btn-primary:hover { filter: brightness(1.05); }
+  .btn:hover { background: var(--surface-2); }
+  .btn:disabled { opacity: 0.6; cursor: default; }
+
+  .empty-state {
+    border: 1px dashed var(--border-strong); border-radius: 12px; padding: 34px 24px; text-align: center;
+    color: var(--ink-2); font-size: 13px; background: var(--surface);
+  }
+  .empty-state b { color: var(--ink); }
+
+  .result-head { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 12px; }
+  .result-head h3 { font-size: 15.5px; margin: 0; color: var(--navy); }
+  .result-head span { font-size: 12px; color: var(--muted); }
+
+  .block-label { font-size: 10.8px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 7px; font-weight: 700; }
+
+  .kw-pill-list { display: flex; flex-direction: column; gap: 4px; }
+  .kw-pill { display: flex; align-items: center; gap: 6px; font-size: 11.8px; }
+  .kw-pill .ic { flex: none; font-size: 10px; }
+  .kw-pill.pos .ic { color: var(--good); }
+  .kw-pill.neg .ic { color: var(--critical); }
+  .kw-pill.neutral .ic { color: var(--accent); }
+  .kw-pill .w { color: var(--ink); }
+  .kw-pill .n { color: var(--muted); font-variant-numeric: tabular-nums; margin-left: auto; }
+  .kw-pill-empty { font-size: 12px; color: var(--muted); }
+
+  .link-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; box-shadow: var(--shadow); margin-bottom: 12px; }
+  .link-card-top { display: flex; gap: 12px; align-items: flex-start; }
+  .link-card-thumb { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; background: var(--surface-2); border: 1px solid var(--border); }
+  .link-card-headinfo { flex: 1; min-width: 0; }
+  .link-card-title { font-weight: 700; font-size: 14px; color: var(--ink); text-wrap: balance; }
+  .link-card-title a { color: inherit; text-decoration: none; }
+  .link-card-title a:hover { text-decoration: underline; }
+  .link-card-domain { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .link-card-price-block { flex: none; text-align: right; }
+  .link-card-price { font-weight: 800; font-size: 15px; color: var(--navy); font-variant-numeric: tabular-nums; }
+  .link-card-weight { font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
+  .link-card-unitprice { font-size: 11.5px; color: var(--muted); margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .link-card-note { font-size: 11.5px; color: var(--muted); margin-top: 10px; }
+  .link-card.error { border-color: color-mix(in srgb, var(--critical) 40%, var(--border)); }
+  .link-card-error-msg { font-size: 12px; color: var(--critical); margin-top: 4px; }
+
+  .link-kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; }
+
+  .selling-point-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .selling-point-pill {
+    font-size: 11.5px; font-weight: 600; color: var(--navy); background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    padding: 3px 10px; border-radius: 999px; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+
+  /* ---------- Strategy ---------- */
+  .insight-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 18px; }
+  .insight-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .insight-card h4 { margin: 0 0 8px; font-size: 13.5px; display: flex; align-items: center; gap: 7px; color: var(--navy); }
+  .insight-card p { margin: 0; font-size: 12.8px; color: var(--ink-2); }
+  .insight-card p + p { margin-top: 8px; }
+  .insight-card ol, .insight-card ul.plain-list { margin: 8px 0 0; padding-left: 20px; font-size: 12.6px; color: var(--ink-2); }
+  .insight-card ol li, .insight-card ul.plain-list li { margin-bottom: 5px; }
+  .insight-card ol b, .insight-card ul.plain-list b { color: var(--ink); }
+  .insight-card .block-label { margin: 0 0 6px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0; font-size: 12.6px; gap: 10px; }
+  .stat-row span:first-child { color: var(--ink-2); text-wrap: balance; }
+  .stat-row b { font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+
+  .stat-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat-tile {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .stat-tile .label { font-size: 11.5px; color: var(--ink-2); }
+  .stat-tile .value { font-size: 19px; font-weight: 800; color: var(--navy); margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 880px) {
+    .link-box-grid { grid-template-columns: 1fr; }
+    .link-kw-grid { grid-template-columns: 1fr; }
+    .insight-grid { grid-template-columns: 1fr; }
+    .topbar-inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-badge">IDEA</span>
+      <span class="brand-text">신제품 기획보드</span>
+    </div>
+    <nav class="pill-nav">
+      <button class="pill-nav-btn active" data-view="research">시장조사</button>
+      <button class="pill-nav-btn" data-view="strategy">전략 인사이트</button>
+    </nav>
+  </div>
+</header>
+
+<main class="main">
+  <!-- ================= MARKET RESEARCH ================= -->
+  <section class="view active" id="view-research">
+    <div class="page-head">
+      <div class="page-title">시장조사</div>
+      <div class="page-desc">상품 상세페이지 링크를 최대 10개 입력하면 판매가·중량·100g(100ml)당 가격과 리뷰 긍정/부정 키워드를 정리해드립니다.</div>
+    </div>
+
+    <div class="link-research-title">상품 상세페이지 링크 (최대 10개)</div>
+    <div class="link-research-desc">분석하고 싶은 상품 상세페이지 링크를 아래 칸에 하나씩 붙여넣으세요.</div>
+    <div class="link-box-grid" id="linkBoxGrid"></div>
+    <div class="link-research-actions">
+      <button class="btn btn-primary" id="linkFetchBtn" type="button">가져오기</button>
+      <span class="link-count" id="linkCount"></span>
+    </div>
+    <div id="linkResults"></div>
+  </section>
+
+  <!-- ================= STRATEGY ================= -->
+  <section class="view" id="view-strategy">
+    <div class="page-head">
+      <div class="page-title" id="strategyPageTitle">전략 인사이트</div>
+      <div class="page-desc">시장조사 탭에서 분석한 제품들을 바탕으로 단가 비교와 가격 포지셔닝, 리뷰 키워드를 종합해 보여줍니다.</div>
+    </div>
+    <div id="strategyResults"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var LINK_BOX_COUNT = 10;
+  var state = { linkResults: [], sellingPointLexicon: [] };
+
+  var NEGATIVE_IMPROVEMENT_MAP = {
+    '효과 체감 부족': '핵심 효능이 체감되도록 농도·성분·사용법 안내를 보강해야 합니다.',
+    '높은 가격': '가격 대비 가치를 높이거나 가격 정책 재검토가 필요합니다.',
+    '누액 문제': '용기 밀폐력·마감 품질 개선이 필요합니다.',
+    '짧은 사용기간': '용량 대비 사용 기간에 대한 기대치 안내 또는 용량 확대가 필요합니다.',
+    '포장 파손': '배송·포장 과정의 파손 방지 포장재 보강이 필요합니다.',
+    '배송 지연': '배송 리드타임 단축 또는 배송 현황 안내 강화가 필요합니다.',
+    '향 부족/자극': '향(또는 핵심 기능) 지속력·강도 개선이 필요합니다.',
+    '세정력 부족': '핵심 기능(세정력) 성능 개선이 필요합니다.',
+    '탈취력 부족': '핵심 기능(탈취력) 성능 개선이 필요합니다.',
+    '내구성 부족': '소재 및 구조 내구성 개선이 필요합니다.',
+    '환불 요청': '환불로 이어지는 주요 불만 원인(품질·기대치 불일치)을 우선 점검해야 합니다.',
+    '불량품': '초기 불량률을 낮추는 품질 검수 강화가 필요합니다.',
+    '적은 용량': '용량 옵션 다양화 또는 대용량 구성 검토가 필요합니다.',
+    '사용 불편': '사용성(조작·설치 편의성) 개선이 필요합니다.',
+    '이물질 발견': '생산·포장 공정의 위생·이물 관리 강화가 필요합니다.'
+  };
+
+  function fmtWon(n) { return Number(n).toLocaleString('ko-KR') + '원'; }
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function domainOf(url) {
+    try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return url; }
+  }
+
+  /* ---------- view switching ---------- */
+  function switchView(view) {
+    document.querySelectorAll('.pill-nav-btn').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-view') === view); });
+    document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+    document.getElementById('view-' + view).classList.add('active');
+  }
+  document.querySelectorAll('.pill-nav-btn').forEach(function (b) {
+    b.addEventListener('click', function () { switchView(b.getAttribute('data-view')); });
+  });
+
+  /* ---------- link input boxes ---------- */
+  var linkBoxGridEl = document.getElementById('linkBoxGrid');
+  var linkBoxClearBtns = [];
+  for (var i = 0; i < LINK_BOX_COUNT; i++) {
+    var wrap = document.createElement('div');
+    wrap.className = 'link-box';
+    var num = document.createElement('span');
+    num.className = 'link-box-num';
+    num.textContent = String(i + 1);
+    var input = document.createElement('input');
+    input.className = 'link-box-input';
+    input.type = 'url';
+    input.placeholder = '상품 상세페이지 링크 ' + (i + 1);
+    input.setAttribute('data-idx', String(i));
+    var clearBtn = document.createElement('button');
+    clearBtn.type = 'button';
+    clearBtn.className = 'link-box-clear';
+    clearBtn.setAttribute('aria-label', '입력 지우기');
+    clearBtn.textContent = '✕';
+    wrap.appendChild(num);
+    wrap.appendChild(input);
+    wrap.appendChild(clearBtn);
+    linkBoxGridEl.appendChild(wrap);
+    linkBoxClearBtns.push(clearBtn);
+  }
+  var linkBoxInputs = Array.prototype.slice.call(linkBoxGridEl.querySelectorAll('.link-box-input'));
+
+  function parseLinks() {
+    return linkBoxInputs.map(function (el) { return el.value.trim(); }).filter(Boolean);
+  }
+  var linkCountEl = document.getElementById('linkCount');
+  function updateLinkCount() {
+    var n = parseLinks().length;
+    linkCountEl.textContent = n > 0 ? (n + ' / ' + LINK_BOX_COUNT + '개') : '';
+  }
+  linkBoxInputs.forEach(function (input, idx) {
+    input.addEventListener('input', updateLinkCount);
+    input.addEventListener('paste', function (e) {
+      var text = (e.clipboardData || window.clipboardData).getData('text');
+      var parts = text.split(/[\n\r]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+      if (parts.length > 1) {
+        e.preventDefault();
+        for (var j = 0; j < parts.length && (idx + j) < linkBoxInputs.length; j++) {
+          linkBoxInputs[idx + j].value = parts[j];
+        }
+        updateLinkCount();
+      }
+    });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (idx + 1 < linkBoxInputs.length) linkBoxInputs[idx + 1].focus();
+      }
+    });
+    linkBoxClearBtns[idx].addEventListener('click', function () {
+      input.value = '';
+      updateLinkCount();
+      input.focus();
+    });
+  });
+
+  /* ---------- fetch + render link analysis results ---------- */
+  var linkFetchBtn = document.getElementById('linkFetchBtn');
+  var linkResultsEl = document.getElementById('linkResults');
+
+  function renderLinkResults(results) {
+    if (!results || results.length === 0) { linkResultsEl.innerHTML = ''; return; }
+    var html = '<div class="result-head"><h3>입력한 링크 ' + results.length + '개 분석 결과</h3></div>';
+    results.forEach(function (r) {
+      var safeUrl = escapeHtml(r.url);
+      if (r.ok) {
+        html += '<div class="link-card">';
+        html += '<div class="link-card-top">';
+        if (r.image && /^https?:\/\//i.test(r.image)) {
+          html += '<img class="link-card-thumb" src="' + escapeHtml(r.image) + '" alt="" onerror="this.remove()"/>';
+        }
+        html += '<div class="link-card-headinfo">';
+        html += '<div class="link-card-title"><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(r.title || r.url) + '</a></div>';
+        html += '<div class="link-card-domain">' + escapeHtml(domainOf(r.url)) + '</div>';
+        html += '</div>';
+        html += '<div class="link-card-price-block">';
+        html += '<div class="link-card-price">' + (r.price != null ? fmtWon(r.price) : '가격 미확인') + '</div>';
+        if (r.weight) html += '<div class="link-card-weight">' + Number(r.weight.amount).toLocaleString('ko-KR') + (r.weight.unit === 'g' ? 'g' : 'ml') + '</div>';
+        if (r.unitPrice) html += '<div class="link-card-unitprice">' + r.unitPrice.unit + '당 ' + fmtWon(r.unitPrice.amount) + '</div>';
+        html += '</div>';
+        html += '</div>';
+
+        html += '<div class="block-label" style="margin-top:14px">핵심 소구포인트</div>';
+        if (r.sellingPoints && r.sellingPoints.length) {
+          html += '<div class="selling-point-list">';
+          r.sellingPoints.forEach(function (sp) { html += '<span class="selling-point-pill">' + escapeHtml(sp.point) + '</span>'; });
+          html += '</div>';
+        } else {
+          html += '<div class="kw-pill-empty">핵심 소구포인트로 볼 만한 근거를 찾지 못했어요</div>';
+        }
+
+        html += '<div class="link-kw-grid">';
+        html += '<div><div class="block-label">긍정 리뷰 키워드 TOP5</div><div class="kw-pill-list">';
+        if (r.positiveKeywords && r.positiveKeywords.length) {
+          r.positiveKeywords.forEach(function (k) { html += '<div class="kw-pill pos"><span class="ic">▲</span><span class="w">' + escapeHtml(k.keyword) + '</span><span class="n">' + k.count + '</span></div>'; });
+        } else {
+          html += '<div class="kw-pill-empty">감지된 키워드 없음</div>';
+        }
+        html += '</div></div>';
+        html += '<div><div class="block-label">부정 리뷰 키워드 TOP5</div><div class="kw-pill-list">';
+        if (r.negativeKeywords && r.negativeKeywords.length) {
+          r.negativeKeywords.forEach(function (k) { html += '<div class="kw-pill neg"><span class="ic">▼</span><span class="w">' + escapeHtml(k.keyword) + '</span><span class="n">' + k.count + '</span></div>'; });
+        } else {
+          html += '<div class="kw-pill-empty">감지된 키워드 없음</div>';
+        }
+        html += '</div></div>';
+        html += '</div>';
+
+        if (r.reviewNote) html += '<div class="link-card-note">' + escapeHtml(r.reviewNote) + '</div>';
+        html += '</div>';
+      } else {
+        html += '<div class="link-card error"><div class="link-card-body">';
+        html += '<div class="link-card-title"><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">' + safeUrl + '</a></div>';
+        html += '<div class="link-card-error-msg">가져오지 못했어요 — ' + escapeHtml(r.error || '알 수 없는 오류') + '</div>';
+        html += '</div></div>';
+      }
+    });
+    linkResultsEl.innerHTML = html;
+  }
+
+  function runLinkFetch() {
+    var links = parseLinks();
+    if (links.length === 0) return;
+    linkFetchBtn.disabled = true;
+    linkFetchBtn.textContent = '가져오는 중...';
+    linkResultsEl.innerHTML = '<div class="empty-state">링크 ' + links.length + '개를 분석하고 있어요...</div>';
+    fetch('/api/fetch-links', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ links: links })
+    }).then(function (res) {
+      if (!res.ok) throw new Error('서버 응답 오류 (' + res.status + ')');
+      return res.json();
+    }).then(function (data) {
+      state.linkResults = data.results || [];
+      state.sellingPointLexicon = data.sellingPointLexicon || [];
+      renderLinkResults(state.linkResults);
+      renderStrategy();
+    }).catch(function (err) {
+      linkResultsEl.innerHTML = '<div class="empty-state">가져오지 못했습니다: ' + escapeHtml(err.message) + '<br/>백엔드 서버가 실행 중인지 확인해주세요.</div>';
+    }).finally(function () {
+      linkFetchBtn.disabled = false;
+      linkFetchBtn.textContent = '가져오기';
+    });
+  }
+  linkFetchBtn.addEventListener('click', runLinkFetch);
+
+  /* ---------- strategy: aggregated from analyzed links ---------- */
+  function renderStrategy() {
+    var el = document.getElementById('strategyResults');
+    var data = (state.linkResults || []).filter(function (r) { return r.ok; });
+    if (data.length === 0) {
+      el.innerHTML = '<div class="empty-state">아직 분석된 링크가 없습니다.<br/>먼저 <b>시장조사</b> 탭에서 링크를 입력하고 가져오면 가격·단가·리뷰 키워드 기반 인사이트가 여기에 표시됩니다.</div>';
+      return;
+    }
+
+    var priced = data.filter(function (r) { return r.price != null; });
+    var prices = priced.map(function (r) { return r.price; });
+    var avgPrice = prices.length ? Math.round(prices.reduce(function (a, b) { return a + b; }, 0) / prices.length) : null;
+
+    var gapLow = null, gapHigh = null;
+    if (priced.length >= 2) {
+      var sortedByPrice = priced.slice().sort(function (a, b) { return a.price - b.price; });
+      var biggestGap = 0;
+      for (var i = 0; i < sortedByPrice.length - 1; i++) {
+        var gap = sortedByPrice[i + 1].price - sortedByPrice[i].price;
+        if (gap > biggestGap) { biggestGap = gap; gapLow = sortedByPrice[i].price; gapHigh = sortedByPrice[i + 1].price; }
+      }
+    }
+
+    var unitPriced = data.filter(function (r) { return r.unitPrice; }).slice().sort(function (a, b) { return a.unitPrice.amount - b.unitPrice.amount; });
+
+    var posCounts = {}, negCounts = {}, spCounts = {}, spCoverage = {};
+    data.forEach(function (r) {
+      (r.positiveKeywords || []).forEach(function (k) { posCounts[k.keyword] = (posCounts[k.keyword] || 0) + k.count; });
+      (r.negativeKeywords || []).forEach(function (k) { negCounts[k.keyword] = (negCounts[k.keyword] || 0) + k.count; });
+      var seen = {};
+      (r.sellingPoints || []).forEach(function (sp) {
+        spCounts[sp.point] = (spCounts[sp.point] || 0) + sp.count;
+        if (!seen[sp.point]) { spCoverage[sp.point] = (spCoverage[sp.point] || 0) + 1; seen[sp.point] = true; }
+      });
+    });
+    var topPos = Object.keys(posCounts).map(function (k) { return { keyword: k, count: posCounts[k] }; }).sort(function (a, b) { return b.count - a.count; }).slice(0, 5);
+    var topNeg = Object.keys(negCounts).map(function (k) { return { keyword: k, count: negCounts[k] }; }).sort(function (a, b) { return b.count - a.count; }).slice(0, 5);
+    var allSp = Object.keys(spCounts).map(function (k) { return { point: k, count: spCounts[k], coverage: spCoverage[k] }; }).sort(function (a, b) { return b.count - a.count; });
+    var topSp = allSp.slice(0, 5);
+
+    var mentionedPoints = Object.keys(spCounts);
+    var untappedPoints = (state.sellingPointLexicon || []).filter(function (w) { return mentionedPoints.indexOf(w) === -1; }).slice(0, 5);
+
+    var recommendedPrice = (gapLow != null) ? Math.round((gapLow + gapHigh) / 2 / 100) * 100 : null;
+    var recommendedUnitPrice = unitPriced.length ? Math.max(1, Math.round(unitPriced[0].unitPrice.amount * 0.93 / 10) * 10) : null;
+    var recommendedUnitLabel = unitPriced.length ? unitPriced[0].unitPrice.unit : null;
+
+    var html = '<div class="stat-tiles">';
+    html += '<div class="stat-tile"><div class="label">분석한 제품 수</div><div class="value">' + data.length + '개</div></div>';
+    if (prices.length) {
+      html += '<div class="stat-tile"><div class="label">평균 판매가</div><div class="value">' + fmtWon(avgPrice) + '</div></div>';
+      html += '<div class="stat-tile"><div class="label">가격 범위</div><div class="value" style="font-size:14px">' + fmtWon(Math.min.apply(null, prices)) + '~' + fmtWon(Math.max.apply(null, prices)) + '</div></div>';
+    }
+    html += '</div>';
+
+    html += '<div class="insight-grid">';
+
+    html += '<div class="insight-card"><h4>⚖️ 단가 비교 (100g/100ml 기준)</h4>';
+    if (unitPriced.length) {
+      unitPriced.forEach(function (r) {
+        html += '<div class="stat-row"><span>' + escapeHtml(r.title || domainOf(r.url)) + '</span><b>' + r.unitPrice.unit + '당 ' + fmtWon(r.unitPrice.amount) + '</b></div>';
+      });
+    } else {
+      html += '<p>중량/용량 정보를 찾은 제품이 없어 단가 비교를 할 수 없습니다.</p>';
+    }
+    html += '</div>';
+
+    html += '<div class="insight-card"><h4>✨ 종합 소구포인트</h4>';
+    if (topSp.length) {
+      html += '<div class="selling-point-list">';
+      topSp.forEach(function (sp) { html += '<span class="selling-point-pill">' + escapeHtml(sp.point) + '</span>'; });
+      html += '</div>';
+    } else {
+      html += '<p>분석한 제품에서 공통된 소구포인트를 찾지 못했습니다.</p>';
+    }
+    html += '</div>';
+
+    html += '<div class="insight-card"><h4>👍 종합 긍정 키워드</h4><div class="kw-pill-list">';
+    if (topPos.length) {
+      topPos.forEach(function (k) { html += '<div class="kw-pill pos"><span class="ic">▲</span><span class="w">' + escapeHtml(k.keyword) + '</span><span class="n">' + k.count + '</span></div>'; });
+    } else {
+      html += '<div class="kw-pill-empty">감지된 긍정 키워드가 없습니다.</div>';
+    }
+    html += '</div></div>';
+
+    html += '<div class="insight-card"><h4>👎 종합 부정 키워드</h4><div class="kw-pill-list">';
+    if (topNeg.length) {
+      topNeg.forEach(function (k) { html += '<div class="kw-pill neg"><span class="ic">▼</span><span class="w">' + escapeHtml(k.keyword) + '</span><span class="n">' + k.count + '</span></div>'; });
+    } else {
+      html += '<div class="kw-pill-empty">감지된 부정 키워드가 없습니다.</div>';
+    }
+    html += '</div></div>';
+
+    /* ---- 1. 시장 포지셔닝 제안 ---- */
+    html += '<div class="insight-card"><h4>🧭 시장 포지셔닝 제안</h4>';
+    var posSentenceParts = [];
+    if (topSp.length) posSentenceParts.push('‘' + topSp.slice(0, 2).map(function (sp) { return sp.point; }).join(', ') + '’을(를) 주로 강조');
+    if (avgPrice != null) posSentenceParts.push('평균 ' + fmtWon(avgPrice) + ' 부근에 가격이 몰려 있음');
+    html += '<p>분석한 제품 ' + data.length + '개는 ' + (posSentenceParts.length ? posSentenceParts.join(', ') + '.' : '뚜렷한 공통 패턴을 찾지 못했습니다.') + '</p>';
+    if (gapLow != null && untappedPoints.length) {
+      html += '<p>비어 있는 포지션 후보: <b>' + fmtWon(gapLow) + '~' + fmtWon(gapHigh) + '</b> 가격대 + <b>‘' + escapeHtml(untappedPoints[0]) + '’</b> 소구포인트 조합.</p>';
+    } else if (untappedPoints.length) {
+      html += '<p>경쟁 제품들이 아직 강조하지 않은 소구포인트: <b>' + escapeHtml(untappedPoints[0]) + '</b></p>';
+    }
+    html += '</div>';
+
+    /* ---- 2. 권장 판매가 / 권장 단가 ---- */
+    html += '<div class="insight-card"><h4>💰 권장 판매가 / 권장 단가</h4>';
+    if (recommendedPrice != null) {
+      html += '<div class="stat-row"><span>권장 판매가</span><b>' + fmtWon(recommendedPrice) + '</b></div>';
+      html += '<p>가격 갭 구간(' + fmtWon(gapLow) + '~' + fmtWon(gapHigh) + ')의 중간값 기준입니다.</p>';
+    } else {
+      html += '<p>가격을 확인한 제품이 2개 이상일 때 권장 판매가를 계산할 수 있습니다.</p>';
+    }
+    if (recommendedUnitPrice != null) {
+      html += '<div class="stat-row" style="margin-top:8px"><span>권장 단가</span><b>' + recommendedUnitLabel + '당 ' + fmtWon(recommendedUnitPrice) + '</b></div>';
+      html += '<p>현재 최저 단가(' + recommendedUnitLabel + '당 ' + fmtWon(unitPriced[0].unitPrice.amount) + ') 대비 경쟁력 있는 수준으로 제안한 값입니다.</p>';
+    } else {
+      html += '<p>중량·용량 정보를 찾은 제품이 없어 권장 단가를 계산할 수 없습니다.</p>';
+    }
+    html += '</div>';
+
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  renderStrategy();
+})();
+</script>
